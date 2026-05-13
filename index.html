@@ -25,6 +25,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- PapaParse CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- SheetJS CDN for Excel export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -38,25 +40,16 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
 
-    <!-- Mexican Flag Loading Screen -->
+    <!-- Animated Food Loading Screen -->
     <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white dark:bg-gray-900 transition-opacity duration-500">
-        <div class="relative w-48 h-32 mb-6 shadow-2xl rounded-lg overflow-hidden flex animate-bounce">
-            <div class="w-1/3 h-full bg-[#006847]"></div>
-            <div class="w-1/3 h-full bg-white flex items-center justify-center">
-                <svg viewBox="0 0 100 100" class="w-10 h-10">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="#664d03" stroke-width="2"/>
-                    <path d="M30,70 Q50,20 70,70" fill="none" stroke="#198754" stroke-width="3"/>
-                    <path d="M40,50 L60,50 M50,40 L50,60" stroke="#CE1126" stroke-width="2"/>
-                    <text x="50" y="85" font-size="10" text-anchor="middle" fill="#664d03" font-weight="bold">MÉXICO</text>
-                </svg>
-            </div>
-            <div class="w-1/3 h-full bg-[#CE1126]"></div>
+        <div class="relative mb-6">
+            <div id="food-icon" class="text-8xl transition-all duration-700 ease-in-out transform">🌮</div>
         </div>
         <div class="text-center">
-            <h2 class="text-2xl font-bold bg-gradient-to-r from-[#006847] via-gray-600 to-[#CE1126] bg-clip-text text-transparent mb-2">
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-[#006847] via-gray-600 to-[#CE1126] bg-clip-text text-transparent mb-2 animate-pulse">
                 Cocinando tu guía...
             </h2>
-            <p class="text-gray-500 dark:text-gray-400 animate-pulse">Sabor tapatío en camino</p>
+            <p id="food-text" class="text-gray-500 dark:text-gray-400 font-semibold">Tacos & Varios</p>
         </div>
     </div>
 
@@ -66,9 +59,15 @@
             <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 <i class="fa-solid fa-map-location-dot mr-2"></i>GDL Food Guide
             </h1>
-            <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
-            </button>
+            <div class="flex items-center gap-2">
+                <button id="export-excel" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm font-semibold">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span class="hidden sm:inline">Exportar Excel</span>
+                </button>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -113,7 +112,7 @@
     </main>
 
     <footer class="py-10 text-center text-gray-500 text-xs border-t border-gray-200 dark:border-gray-800 mt-10">
-        <p>© 2026 GDL Food Guide • Hecho con <i class="fa-solid fa-heart text-secondary"></i> para el mundo</p>
+        <p>© 2026 GDL Food Guide • Creado por Devcop95</p>
     </footer>
 
     <script>
@@ -144,14 +143,15 @@
                 ]);
                 render();
                 
-                // Keep the patriotic loading screen visible for at least 3 seconds
+                // Keep the loading screen visible for at least 6 seconds to show full animation cycle
                 setTimeout(() => {
                     const overlay = document.getElementById('loading-overlay');
+                    if (foodInterval) clearInterval(foodInterval);
                     overlay.style.opacity = '0';
                     setTimeout(() => {
                         overlay.style.display = 'none';
                     }, 500);
-                }, 3000);
+                }, 6000);
             } catch (error) {
                 console.error("Error loading data:", error);
                 document.getElementById('cards-container').innerHTML = `
@@ -182,8 +182,7 @@
                             maps: item['📍 Google Maps'] || '',
                             phone: item['phone'] || 'N/A',
                             hours: item['hours'] || 'N/A',
-                            photo: item['photo'] || '',
-                            website: item['website'] || ''
+                            photo: item['photo'] || ''
                         }));
                         resolve();
                     }
@@ -211,7 +210,9 @@
         }
 
         function createCard(item) {
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + ' ' + item.address)}`;
+            const mapsUrl = (item.maps && item.maps !== 'N/A')
+                ? item.maps
+                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('"' + item.name + '" ' + item.address + ' Guadalajara Jalisco')}`;
             const hasPhoto = item.photo && item.photo !== 'N/A';
             
             return `
@@ -257,21 +258,11 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2">
-                            <a href="${mapsUrl}" target="_blank" 
+                        <div class="grid grid-cols-1 gap-2">
+                            <a href="${mapsUrl}" target="_blank"
                                 class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white dark:hover:bg-primary text-gray-700 dark:text-gray-200 font-bold rounded-2xl flex items-center justify-center transition-all text-xs">
-                                <i class="fa-solid fa-diamond-turn-right mr-2"></i>Mapa
+                                <i class="fa-solid fa-diamond-turn-right mr-2"></i>Ver en Mapa
                             </a>
-                            ${item.website && item.website !== 'N/A' ? `
-                            <a href="${item.website}" target="_blank" 
-                                class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-secondary hover:text-white dark:hover:bg-secondary text-gray-700 dark:text-gray-200 font-bold rounded-2xl flex items-center justify-center transition-all text-xs">
-                                <i class="fa-solid fa-globe mr-2"></i>Web
-                            </a>
-                            ` : `
-                            <button disabled class="py-3 bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 font-bold rounded-2xl flex items-center justify-center text-xs">
-                                <i class="fa-solid fa-globe mr-2"></i>Sin Web
-                            </button>
-                            `}
                         </div>
                     </div>
                 </div>
@@ -325,6 +316,124 @@
                 themeIcon.classList.replace('fa-moon', 'fa-sun');
             }
         });
+
+        // Excel Export Function
+        document.getElementById('export-excel').addEventListener('click', () => {
+            const workbook = XLSX.utils.book_new();
+
+            // Export each category to separate sheet
+            const categories = [
+                { key: 'tacos', name: 'Tacos y Varios' },
+                { key: 'tortas', name: 'Tortas Ahogadas' },
+                { key: 'menudo', name: 'Menuderías' }
+            ];
+
+            categories.forEach(cat => {
+                const data = dataStore[cat.key].map((item, index) => ({
+                    '#': index + 1,
+                    'Negocio': item.name,
+                    'Dirección': item.address,
+                    'Calificación': item.rating,
+                    'Precio': item.price,
+                    'Teléfono': item.phone,
+                    'Horario': item.hours,
+                    'Detalles': item.detail
+                }));
+
+                const worksheet = XLSX.utils.json_to_sheet(data);
+
+                // Add header for link column
+                worksheet['I1'] = { t: 's', v: 'Google Maps' };
+
+                // Add hyperlinks for Google Maps and Website columns
+                dataStore[cat.key].forEach((item, index) => {
+                    const row = index + 2; // +2 because header is row 1, data starts at row 2
+
+                    // Google Maps hyperlink
+                    const mapsUrl = item.maps || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('"' + item.name + '" ' + item.address)}`;
+                    const mapsCell = XLSX.utils.encode_cell({ r: row - 1, c: 8 }); // column I
+                    worksheet[mapsCell] = {
+                        t: 's',
+                        v: 'Ver en Mapa',
+                        l: { Target: mapsUrl }
+                    };
+
+                });
+
+                // Update range to include new column
+                const range = XLSX.utils.decode_range(worksheet['!ref']);
+                range.e.c = 8; // extend to column I
+                worksheet['!ref'] = XLSX.utils.encode_range(range);
+
+                // Set column widths
+                worksheet['!cols'] = [
+                    { wch: 5 },  // #
+                    { wch: 30 }, // Negocio
+                    { wch: 40 }, // Dirección
+                    { wch: 12 }, // Calificación
+                    { wch: 15 }, // Precio
+                    { wch: 15 }, // Teléfono
+                    { wch: 25 }, // Horario
+                    { wch: 50 }, // Detalles
+                    { wch: 15 }  // Google Maps
+                ];
+
+                XLSX.utils.book_append_sheet(workbook, worksheet, cat.name);
+            });
+
+            // Create summary sheet with totals
+            const summaryData = [
+                { 'Categoría': 'Tacos y Varios', 'Total Negocios': dataStore.tacos.length },
+                { 'Categoría': 'Tortas Ahogadas', 'Total Negocios': dataStore.tortas.length },
+                { 'Categoría': 'Menuderías', 'Total Negocios': dataStore.menudo.length },
+                { 'Categoría': 'TOTAL', 'Total Negocios': dataStore.tacos.length + dataStore.tortas.length + dataStore.menudo.length }
+            ];
+            const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+            summarySheet['!cols'] = [{ wch: 20 }, { wch: 15 }];
+            XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
+
+            // Generate filename with date
+            const today = new Date().toISOString().split('T')[0];
+            const filename = `GDL_Food_Guide_${today}.xlsx`;
+
+            // Download
+            XLSX.writeFile(workbook, filename);
+        });
+
+        // Animated food loading sequence
+        const foodSequence = [
+            { icon: '🌮', text: 'Tacos & Varios' },
+            { icon: '🥖', text: 'Tortas Ahogadas' },
+            { icon: '🍲', text: 'Menuderías' }
+        ];
+        let currentFood = 0;
+        let foodInterval;
+
+        function rotateFood() {
+            const foodIcon = document.getElementById('food-icon');
+            const foodText = document.getElementById('food-text');
+
+            if (!foodIcon || !foodText) return;
+
+            // Rotate out
+            foodIcon.style.transform = 'rotateY(90deg) scale(0.5)';
+            foodIcon.style.opacity = '0';
+
+            setTimeout(() => {
+                currentFood = (currentFood + 1) % foodSequence.length;
+                foodIcon.textContent = foodSequence[currentFood].icon;
+                foodText.textContent = foodSequence[currentFood].text;
+
+                // Rotate in
+                setTimeout(() => {
+                    foodIcon.style.transform = 'rotateY(0deg) scale(1)';
+                    foodIcon.style.opacity = '1';
+                }, 50);
+            }, 350);
+        }
+
+        // Start food rotation immediately
+        foodInterval = setInterval(rotateFood, 1200);
 
         // Initialize App
         init();

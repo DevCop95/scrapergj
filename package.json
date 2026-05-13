@@ -13,6 +13,7 @@
   "dependencies": {
     "csv-parser": "^3.2.1",
     "csv-writer": "^1.6.0",
+    "playwright": "^1.60.0",
     "puppeteer": "^24.43.1"
   }
 }
