@@ -181,7 +181,10 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
 
 async function startRepair() {
     // Create browser pool (5 pages)
-    const browser = await chromium.launch({ headless: true });
+    const browser = await chromium.launch({
+        headless: true,
+        channel: 'chromium'
+    });
     const pool = [];
     for (let i = 0; i < 5; i++) {
         const context = await browser.newContext();
