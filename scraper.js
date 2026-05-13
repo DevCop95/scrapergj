@@ -9,10 +9,7 @@ const INPUT_FILES = [
     { path: '-Negocio-Direccin--PrecioMXN-Perfildecliente-Googl.csv', enriched: 'enriched_-Negocio-Direccin--PrecioMXN-Perfildecliente-Googl.csv' }
 ];
 
-async function scrapeBusinessDataPlaywright(businessName, address) {
-    const browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext();
-    const page = await context.newPage();
+async function scrapeBusinessDataPlaywright(businessName, address, page) {
     
     try {
         const normalize = (str) => str.toLowerCase()
@@ -80,8 +77,34 @@ async function scrapeBusinessDataPlaywright(businessName, address) {
             const currentNorm = normalize(currentTitle);
             const matchedWords = targetWords.filter(w => currentNorm.includes(w));
             const matchRatio = targetWords.length > 0 ? matchedWords.length / targetWords.length : 0;
-            
-            return { title: currentTitle, matchRatio, matched: (matchRatio >= 0.4 || (targetNorm.includes('anita') && currentNorm.includes('anita'))) };
+
+            // Levenshtein distance for short names
+            const levenshtein = (a, b) => {
+                const matrix = Array(b.length + 1).fill(null).map(() => Array(a.length + 1).fill(null));
+                for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+                for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+                for (let j = 1; j <= b.length; j++) {
+                    for (let i = 1; i <= a.length; i++) {
+                        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                        matrix[j][i] = Math.min(
+                            matrix[j][i - 1] + 1,
+                            matrix[j - 1][i] + 1,
+                            matrix[j - 1][i - 1] + cost
+                        );
+                    }
+                }
+                return matrix[b.length][a.length];
+            };
+
+            const distance = levenshtein(targetNorm, currentNorm);
+            const maxLen = Math.max(targetNorm.length, currentNorm.length);
+            const similarity = 1 - distance / maxLen;
+
+            // Match if: high word overlap OR high similarity OR exact substring match
+            const matched = matchRatio >= 0.6 || similarity >= 0.75 ||
+                           targetNorm.includes(currentNorm) || currentNorm.includes(targetNorm);
+
+            return { title: currentTitle, matchRatio, matched };
         }
 
         const refinedQuery = `${businessName} ${address}`.toLowerCase().includes('guadalajara') ? 
@@ -149,16 +172,38 @@ async function scrapeBusinessDataPlaywright(businessName, address) {
             };
         });
 
-        await browser.close();
         return data;
     } catch (error) {
         console.error(`Error scraping ${businessName}:`, error.message);
-        await browser.close();
         return null;
     }
 }
 
 async function startRepair() {
+    // Create browser pool (5 pages)
+    const browser = await chromium.launch({ headless: true });
+    const pool = [];
+    for (let i = 0; i < 5; i++) {
+        const context = await browser.newContext();
+        const page = await context.newPage();
+        pool.push({ page, busy: false });
+    }
+
+    async function getFreePage() {
+        while (true) {
+            const freePage = pool.find(p => !p.busy);
+            if (freePage) {
+                freePage.busy = true;
+                return freePage;
+            }
+            await new Promise(r => setTimeout(r, 100));
+        }
+    }
+
+    function releasePage(pageObj) {
+        pageObj.busy = false;
+    }
+
     for (const fileInfo of INPUT_FILES) {
         const results = [];
         console.log(`Checking for missing data in ${fileInfo.enriched}...`);
@@ -181,11 +226,14 @@ async function startRepair() {
 
         for (const item of dataRows) {
             const needsPhoto = !item.photo || item.photo === 'N/A';
-            const needsMapsUrl = true; 
+            const needsMapsUrl = !item['📍 Google Maps'] || item['📍 Google Maps'] === 'N/A'; 
 
             if (needsPhoto || needsMapsUrl) {
                 console.log(`Enriching: ${item['Negocio']}`);
-                const extra = await scrapeBusinessDataPlaywright(item['Negocio'], item['Dirección']);
+                const pageObj = await getFreePage();
+                const extra = await scrapeBusinessDataPlaywright(item['Negocio'], item['Dirección'], pageObj.page);
+                releasePage(pageObj);
+
                 if (extra) {
                     const updated = { ...item };
                     if (extra.photo && extra.photo !== 'N/A') updated.photo = extra.photo;
@@ -200,21 +248,9 @@ async function startRepair() {
                     repairedData.push(updated);
                     repairedCount++;
                 } else {
-                    // Verification failed - clear bad URL AND bad photo
-                    const updated = { ...item };
-                    let changed = false;
-                    if (updated['📍 Google Maps'] && updated['📍 Google Maps'] !== 'N/A') {
-                        console.log(`  🗑️ Removing bad URL for: ${item['Negocio']}`);
-                        updated['📍 Google Maps'] = 'N/A';
-                        changed = true;
-                    }
-                    if (updated.photo && updated.photo !== 'N/A') {
-                        console.log(`  🗑️ Removing bad photo for: ${item['Negocio']}`);
-                        updated.photo = 'N/A';
-                        changed = true;
-                    }
-                    if (changed) repairedCount++;
-                    repairedData.push(updated);
+                    // Verification failed - keep existing data (might be transient failure)
+                    console.log(`  ⚠️ Verification failed for: ${item['Negocio']} - keeping existing data`);
+                    repairedData.push(item);
                 }
                 await new Promise(r => setTimeout(r, 1000));
             } else {
@@ -234,6 +270,9 @@ async function startRepair() {
             console.log(`No new data found for ${fileInfo.enriched}`);
         }
     }
+
+    // Clean up browser pool
+    await browser.close();
     console.log("Repair process completed.");
 }
 

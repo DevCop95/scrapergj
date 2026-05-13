@@ -91,9 +91,23 @@ async function findPhoto(businessName, address) {
             const mapsUrl = page.url();
 
             if (photo && photo.includes('googleusercontent.com')) {
-                console.log(`  ✅ Found photo for: "${pageTitle}" (${Math.round(ratio*100)}%)`);
-                await browser.close();
-                return { photo, mapsUrl: mapsUrl.includes('/place/') ? mapsUrl : null };
+                // Validate photo URL with HEAD request
+                try {
+                    const response = await page.evaluate(async (url) => {
+                        const res = await fetch(url, { method: 'HEAD' });
+                        return res.ok;
+                    }, photo);
+
+                    if (response) {
+                        console.log(`  ✅ Found photo for: "${pageTitle}" (${Math.round(ratio*100)}%)`);
+                        await browser.close();
+                        return { photo, mapsUrl: mapsUrl.includes('/place/') ? mapsUrl : null };
+                    } else {
+                        console.log(`  ⚠️ Photo URL returned ${response} for: "${pageTitle}"`);
+                    }
+                } catch (e) {
+                    console.log(`  ⚠️ Photo validation failed: ${e.message}`);
+                }
             }
         } catch (e) {
             console.log(`  Error: ${e.message}`);

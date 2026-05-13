@@ -27,6 +27,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <!-- SheetJS CDN for Excel export -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <!-- Fuse.js CDN for fuzzy search -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -172,18 +174,35 @@
                     header: true,
                     skipEmptyLines: true,
                     complete: (results) => {
-                        // Normalize headers and include enriched fields
+                        // Validate required columns exist
+                        const requiredCols = ['Negocio', 'Dirección'];
+                        const headers = results.meta.fields || [];
+                        const missing = requiredCols.filter(col => !headers.includes(col));
+
+                        if (missing.length > 0) {
+                            console.error(`CSV missing required columns: ${missing.join(', ')}`);
+                            dataStore[key] = [];
+                            resolve();
+                            return;
+                        }
+
+                        // Normalize headers with defaults for missing enriched fields
                         dataStore[key] = results.data.map(item => ({
                             name: item['Negocio'] || '',
                             address: item['Dirección'] || '',
                             rating: item['⭐'] || '0',
-                            price: item['💰 Precio (MXN)'] || '',
+                            price: item['💰 Precio (MXN)'] || 'N/A',
                             detail: item['📝 Especialidad'] || item['📝 Observaciones'] || item['📝 Perfil de cliente'] || '',
-                            maps: item['📍 Google Maps'] || '',
+                            maps: item['📍 Google Maps'] || 'N/A',
                             phone: item['phone'] || 'N/A',
                             hours: item['hours'] || 'N/A',
                             photo: item['photo'] || ''
                         }));
+                        resolve();
+                    },
+                    error: (error) => {
+                        console.error(`Error parsing CSV for ${key}:`, error);
+                        dataStore[key] = [];
                         resolve();
                     }
                 });
@@ -193,11 +212,28 @@
         function render() {
             const container = document.getElementById('cards-container');
             const emptyState = document.getElementById('empty-state');
-            
-            const filteredData = dataStore[currentCategory].filter(item => {
-                const searchStr = `${item.name} ${item.address} ${item.detail}`.toLowerCase();
-                return searchStr.includes(searchQuery.toLowerCase());
-            });
+
+            let filteredData;
+            if (!searchQuery) {
+                // No search query - show all
+                filteredData = dataStore[currentCategory];
+            } else if (searchQuery.length < 3) {
+                // Short query - exact substring match
+                filteredData = dataStore[currentCategory].filter(item => {
+                    const searchStr = `${item.name} ${item.address} ${item.detail}`.toLowerCase();
+                    return searchStr.includes(searchQuery.toLowerCase());
+                });
+            } else {
+                // Long query - fuzzy search
+                const fuse = new Fuse(dataStore[currentCategory], {
+                    keys: ['name', 'address', 'detail'],
+                    threshold: 0.3, // 0 = exact, 1 = match anything
+                    ignoreLocation: true,
+                    minMatchCharLength: 2
+                });
+                const results = fuse.search(searchQuery);
+                filteredData = results.map(r => r.item);
+            }
 
             if (filteredData.length === 0) {
                 container.innerHTML = '';

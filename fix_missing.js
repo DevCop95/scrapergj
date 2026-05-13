@@ -3,18 +3,37 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-const MISSING = [
-    { name: 'Anita Li', address: 'Av. México 2903, Vallarta Nte', file: 'enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv', queries: ['Anita Li tacos Av México 2903 Guadalajara', 'Anita Li restaurante Vallarta Norte Guadalajara', 'Anita Li Guadalajara tacos'] },
-    { name: 'Taquería Orinoco', address: 'Av. Libertad 1890, Americana', file: 'enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv', queries: ['Taquería Orinoco Libertad Guadalajara', 'Orinoco tacos Americana Guadalajara', 'Taqueria Orinoco Av Libertad 1890'] },
-    { name: 'Tacos Los Parados', address: 'Av. Aztecas, Zapopan', file: 'enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv', queries: ['Tacos Los Parados Aztecas Zapopan', 'Los Parados tacos Zapopan Jalisco', 'Tacos Los Parados Guadalajara'] },
-    { name: 'Tacos Los Migueles', address: 'Av. Patria, Zapopan', file: 'enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv', queries: ['Tacos Los Migueles Patria Zapopan', 'Los Migueles tacos Zapopan', 'Tacos Migueles Av Patria Guadalajara'] },
-    { name: 'Tacos Los Sauces', address: 'Jardines de la Paz', file: 'enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv', queries: ['Tacos Los Sauces Jardines de la Paz Guadalajara', 'Los Sauces tacos Guadalajara Jalisco', 'Tacos Sauces Jardines Paz'] },
-    { name: 'Tacos Los Pioneros', address: 'Av. Copérnico, Zapopan', file: 'enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv', queries: ['Tacos Los Pioneros Copérnico Zapopan', 'Los Pioneros tacos Zapopan', 'Tacos Pioneros Av Copernico Guadalajara'] },
-    { name: 'Tortas Enrique Perro', address: 'Carr. a Tesistán, Zapopan', file: 'enriched_-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv', queries: ['Tortas Enrique Perro Tesistán Zapopan', 'Enrique Perro tortas ahogadas Zapopan', 'Tortas Enrique Perro Guadalajara'] },
-    { name: 'Tortas Los Cuñados', address: 'Av. Patria, Zapopan', file: 'enriched_-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv', queries: ['Tortas Los Cuñados Patria Zapopan', 'Los Cuñados tortas ahogadas Zapopan', 'Tortas Cuñados Av Patria Guadalajara'] },
-    { name: 'Menudería La Estancia (Univa)', address: 'Cerca de Av. Tepeyac', file: 'enriched_-Negocio-Direccin--PrecioMXN-Perfildecliente-Googl.csv', queries: ['Menudería La Estancia Univa Zapopan', 'La Estancia menudo Tepeyac Zapopan', 'Menuderia Estancia Univa Guadalajara'] },
-    { name: 'Menudería San Juan', address: 'Barrio de Analco', file: 'enriched_-Negocio-Direccin--PrecioMXN-Perfildecliente-Googl.csv', queries: ['Menudería San Juan Analco Guadalajara', 'San Juan menudo Barrio Analco', 'Menuderia San Juan Guadalajara Jalisco'] }
+const INPUT_FILES = [
+    'enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv',
+    'enriched_-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv',
+    'enriched_-Negocio-Direccin--PrecioMXN-Perfildecliente-Googl.csv'
 ];
+
+function generateQueries(name, address) {
+    const queries = [];
+    const addressParts = address.split(',').map(s => s.trim());
+    const mainStreet = addressParts[0] || '';
+    const neighborhood = addressParts[1] || '';
+
+    // Basic patterns
+    queries.push(`${name} ${address} Guadalajara`);
+    queries.push(`${name} ${mainStreet} Guadalajara`);
+    if (neighborhood) {
+        queries.push(`${name} ${neighborhood} Guadalajara`);
+    }
+
+    // City variations (Zapopan if in address, otherwise Guadalajara)
+    const city = address.toLowerCase().includes('zapopan') ? 'Zapopan' : 'Guadalajara';
+    queries.push(`${name} ${city} Jalisco`);
+
+    // Simplified name + location
+    const simpleName = name.replace(/^(Tacos|Tortas|Menudería)\s+/i, '');
+    if (simpleName !== name && mainStreet) {
+        queries.push(`${simpleName} ${mainStreet} ${city}`);
+    }
+
+    return queries;
+}
 
 const normalize = (str) => str.toLowerCase()
     .normalize("NFD").replace(/[̀-ͯ]/g, "")
@@ -112,32 +131,51 @@ async function tryFindBusiness(businessName, queries) {
 }
 
 async function fixMissing() {
-    for (const biz of MISSING) {
-        console.log(`\n🔍 ${biz.name} (${biz.address})`);
-        const url = await tryFindBusiness(biz.name, biz.queries);
-
-        if (url) {
-            console.log(`  → ${url.substring(0, 80)}...`);
-            // Update CSV
-            const rows = [];
-            await new Promise((resolve) => {
-                fs.createReadStream(biz.file).pipe(csv()).on('data', (d) => rows.push(d)).on('end', resolve);
-            });
-
-            const idx = rows.findIndex(r => r['Negocio'] === biz.name);
-            if (idx !== -1) {
-                rows[idx]['📍 Google Maps'] = url;
-                const headers = Object.keys(rows[0]).map(k => ({ id: k, title: k }));
-                const writer = createCsvWriter({ path: biz.file, header: headers });
-                await writer.writeRecords(rows);
-                console.log(`  ✅ CSV updated`);
-            }
-        } else {
-            console.log(`  ❌ Not found - keeping N/A`);
+    for (const file of INPUT_FILES) {
+        if (!fs.existsSync(file)) {
+            console.log(`\n⚠️ Skipping ${file} (not found)`);
+            continue;
         }
-        await new Promise(r => setTimeout(r, 1500));
+
+        console.log(`\n📂 Processing ${file}...`);
+        const rows = [];
+        await new Promise((resolve) => {
+            fs.createReadStream(file).pipe(csv()).on('data', (d) => rows.push(d)).on('end', resolve);
+        });
+
+        let updated = 0;
+        for (const row of rows) {
+            const needsUrl = !row['📍 Google Maps'] || row['📍 Google Maps'] === 'N/A';
+            if (!needsUrl) continue;
+
+            const name = row['Negocio'];
+            const address = row['Dirección'];
+            console.log(`\n🔍 ${name} (${address})`);
+
+            const queries = generateQueries(name, address);
+            const url = await tryFindBusiness(name, queries);
+
+            if (url) {
+                console.log(`  → ${url.substring(0, 80)}...`);
+                row['📍 Google Maps'] = url;
+                updated++;
+            } else {
+                console.log(`  ❌ Not found - keeping N/A`);
+            }
+
+            await new Promise(r => setTimeout(r, 1500));
+        }
+
+        if (updated > 0) {
+            const headers = Object.keys(rows[0]).map(k => ({ id: k, title: k }));
+            const writer = createCsvWriter({ path: file, header: headers });
+            await writer.writeRecords(rows);
+            console.log(`\n✅ ${file}: updated ${updated} entries`);
+        } else {
+            console.log(`\n⚪ ${file}: no updates needed`);
+        }
     }
-    console.log('\nDone.');
+    console.log('\n✅ Done.');
 }
 
 fixMissing();
