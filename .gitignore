@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Data files
+*.csv
+
+# Debug/temp files
+*.png
+debug_*.js
+*_v2.js
+*_final.js
+*_deep.js
+*_precision.js
+*_purge.js
+*_surgical.js
+*_unique.js
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db

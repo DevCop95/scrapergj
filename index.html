@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Guadalajara Food Guide</title>
+    <!-- SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌮</text></svg>">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#f59e0b',
+                        secondary: '#ef4444',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PapaParse CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        .dark .glass { background: rgba(31, 41, 55, 0.8); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+    <!-- Mexican Flag Loading Screen -->
+    <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white dark:bg-gray-900 transition-opacity duration-500">
+        <div class="relative w-48 h-32 mb-6 shadow-2xl rounded-lg overflow-hidden flex animate-bounce">
+            <div class="w-1/3 h-full bg-[#006847]"></div>
+            <div class="w-1/3 h-full bg-white flex items-center justify-center">
+                <svg viewBox="0 0 100 100" class="w-10 h-10">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#664d03" stroke-width="2"/>
+                    <path d="M30,70 Q50,20 70,70" fill="none" stroke="#198754" stroke-width="3"/>
+                    <path d="M40,50 L60,50 M50,40 L50,60" stroke="#CE1126" stroke-width="2"/>
+                    <text x="50" y="85" font-size="10" text-anchor="middle" fill="#664d03" font-weight="bold">MÉXICO</text>
+                </svg>
+            </div>
+            <div class="w-1/3 h-full bg-[#CE1126]"></div>
+        </div>
+        <div class="text-center">
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-[#006847] via-gray-600 to-[#CE1126] bg-clip-text text-transparent mb-2">
+                Cocinando tu guía...
+            </h2>
+            <p class="text-gray-500 dark:text-gray-400 animate-pulse">Sabor tapatío en camino</p>
+        </div>
+    </div>
+
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-50 glass border-b border-gray-200 dark:border-gray-800 px-4 py-3">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <i class="fa-solid fa-map-location-dot mr-2"></i>GDL Food Guide
+            </h1>
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-6">
+        <!-- Search Bar -->
+        <div class="relative mb-6">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" id="search-input" 
+                placeholder="Buscar por nombre, dirección o especialidad..." 
+                class="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm">
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="flex space-x-2 mb-8 overflow-x-auto pb-2 custom-scrollbar no-scrollbar">
+            <button data-category="tacos" class="tab-btn active px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all bg-primary text-white shadow-md">
+                <i class="fa-solid fa-taco mr-2 text-white"></i>Tacos y Varios
+            </button>
+            <button data-category="tortas" class="tab-btn px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-primary">
+                <i class="fa-solid fa-bread-slice mr-2 text-secondary"></i>Tortas Ahogadas
+            </button>
+            <button data-category="menudo" class="tab-btn px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-primary">
+                <i class="fa-solid fa-bowl-hot mr-2 text-primary"></i>Menuderías
+            </button>
+        </div>
+
+        <!-- Content Grid -->
+        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Loading State -->
+            <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+                <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i>
+                <p>Cargando sabores tapatíos...</p>
+            </div>
+        </div>
+
+        <!-- Empty State (Hidden) -->
+        <div id="empty-state" class="hidden col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+            <i class="fa-solid fa-utensils text-4xl mb-4"></i>
+            <p>No encontramos nada con ese nombre. ¡Prueba otra búsqueda!</p>
+        </div>
+    </main>
+
+    <footer class="py-10 text-center text-gray-500 text-xs border-t border-gray-200 dark:border-gray-800 mt-10">
+        <p>© 2026 GDL Food Guide • Hecho con <i class="fa-solid fa-heart text-secondary"></i> para el mundo</p>
+    </footer>
+
+    <script>
+        const FILES = {
+            tacos: 'enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv',
+            tortas: 'enriched_-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv',
+            menudo: 'enriched_-Negocio-Direccin--PrecioMXN-Perfildecliente-Googl.csv'
+        };
+
+        let dataStore = {
+            tacos: [],
+            tortas: [],
+            menudo: []
+        };
+
+        let currentCategory = 'tacos';
+        let searchQuery = '';
+
+        // --- Core Functions ---
+
+        async function init() {
+            try {
+                // Try to load enriched files first, fallback to original if not found
+                await Promise.all([
+                    loadCSV('tacos', FILES.tacos).catch(() => loadCSV('tacos', '-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv')),
+                    loadCSV('tortas', FILES.tortas).catch(() => loadCSV('tortas', '-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv')),
+                    loadCSV('menudo', FILES.menudo).catch(() => loadCSV('menudo', '-Negocio-Direccin--PrecioMXN-Perfildecliente-Googl.csv'))
+                ]);
+                render();
+                
+                // Keep the patriotic loading screen visible for at least 3 seconds
+                setTimeout(() => {
+                    const overlay = document.getElementById('loading-overlay');
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            } catch (error) {
+                console.error("Error loading data:", error);
+                document.getElementById('cards-container').innerHTML = `
+                    <div class="col-span-full text-center text-red-500 py-10">
+                        <i class="fa-solid fa-triangle-exclamation text-4xl mb-2"></i>
+                        <p>Error al cargar los datos. Por favor intenta de nuevo.</p>
+                    </div>`;
+            }
+        }
+
+        async function loadCSV(key, url) {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('File not found');
+            const csvText = await response.text();
+            
+            return new Promise((resolve) => {
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        // Normalize headers and include enriched fields
+                        dataStore[key] = results.data.map(item => ({
+                            name: item['Negocio'] || '',
+                            address: item['Dirección'] || '',
+                            rating: item['⭐'] || '0',
+                            price: item['💰 Precio (MXN)'] || '',
+                            detail: item['📝 Especialidad'] || item['📝 Observaciones'] || item['📝 Perfil de cliente'] || '',
+                            maps: item['📍 Google Maps'] || '',
+                            phone: item['phone'] || 'N/A',
+                            hours: item['hours'] || 'N/A',
+                            photo: item['photo'] || '',
+                            website: item['website'] || ''
+                        }));
+                        resolve();
+                    }
+                });
+            });
+        }
+
+        function render() {
+            const container = document.getElementById('cards-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            const filteredData = dataStore[currentCategory].filter(item => {
+                const searchStr = `${item.name} ${item.address} ${item.detail}`.toLowerCase();
+                return searchStr.includes(searchQuery.toLowerCase());
+            });
+
+            if (filteredData.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = filteredData.map(item => createCard(item)).join('');
+        }
+
+        function createCard(item) {
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + ' ' + item.address)}`;
+            const hasPhoto = item.photo && item.photo !== 'N/A';
+            
+            return `
+                <div class="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all group">
+                    ${hasPhoto ? `
+                    <div class="h-40 w-full overflow-hidden">
+                        <img src="${item.photo}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    ` : ''}
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-lg group-hover:text-primary transition-colors">${item.name}</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                    <i class="fa-solid fa-location-dot mr-1"></i>${item.address}
+                                </p>
+                            </div>
+                            <span class="flex items-center px-2 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-lg border border-amber-100 dark:border-amber-800">
+                                <i class="fa-solid fa-star mr-1 text-[10px]"></i>${item.rating}
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-2 mb-5">
+                            <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                                <i class="fa-solid fa-tag w-5 text-gray-400 dark:text-gray-500"></i>
+                                <span class="font-medium">${item.price}</span>
+                            </div>
+                            ${item.phone !== 'N/A' ? `
+                            <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                                <i class="fa-solid fa-phone w-5 text-gray-400 dark:text-gray-500"></i>
+                                <span>${item.phone}</span>
+                            </div>
+                            ` : ''}
+                            ${item.hours !== 'N/A' ? `
+                            <div class="flex items-start text-sm text-gray-600 dark:text-gray-300">
+                                <i class="fa-solid fa-clock w-5 mt-1 text-gray-400 dark:text-gray-500"></i>
+                                <span class="flex-1">${item.hours}</span>
+                            </div>
+                            ` : ''}
+                            <div class="flex items-start text-sm text-gray-600 dark:text-gray-300">
+                                <i class="fa-solid fa-comment-dots w-5 mt-1 text-gray-400 dark:text-gray-500"></i>
+                                <p class="flex-1 leading-snug">${item.detail}</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="${mapsUrl}" target="_blank" 
+                                class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white dark:hover:bg-primary text-gray-700 dark:text-gray-200 font-bold rounded-2xl flex items-center justify-center transition-all text-xs">
+                                <i class="fa-solid fa-diamond-turn-right mr-2"></i>Mapa
+                            </a>
+                            ${item.website && item.website !== 'N/A' ? `
+                            <a href="${item.website}" target="_blank" 
+                                class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-secondary hover:text-white dark:hover:bg-secondary text-gray-700 dark:text-gray-200 font-bold rounded-2xl flex items-center justify-center transition-all text-xs">
+                                <i class="fa-solid fa-globe mr-2"></i>Web
+                            </a>
+                            ` : `
+                            <button disabled class="py-3 bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 font-bold rounded-2xl flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-globe mr-2"></i>Sin Web
+                            </button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Event Listeners ---
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            render();
+        });
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update tabs UI
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-primary', 'text-white', 'shadow-md');
+                    b.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400', 'border-gray-200', 'dark:border-gray-700');
+                    b.querySelector('i').classList.remove('text-white');
+                });
+
+                btn.classList.add('active', 'bg-primary', 'text-white', 'shadow-md');
+                btn.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400', 'border-gray-200', 'dark:border-gray-700');
+                btn.querySelector('i').classList.add('text-white');
+
+                currentCategory = btn.dataset.category;
+                render();
+            });
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.documentElement;
+
+        // Check for saved theme
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            }
+        });
+
+        // Initialize App
+        init();
+    </script>
+</body>
+</html>
