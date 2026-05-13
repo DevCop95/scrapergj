@@ -1,8 +1,9 @@
 # Dependencies
 node_modules/
 
-# Data files
-*.csv
+# Data files (originals only, keep enriched)
+-Negocio-*.csv
+!enriched_*.csv
 
 # Debug/temp files
 *.png
