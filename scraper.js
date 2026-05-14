@@ -12,22 +12,17 @@ const INPUT_FILES = [
 async function scrapeBusinessDataPlaywright(businessName, address, page) {
     try {
         const normalize = (str) => str.toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .normalize("NFD").replace(/[̀-ͯ]/g, "")
             .replace(/\s+/g, ' ').trim();
 
         const targetNorm = normalize(businessName);
         const targetWords = targetNorm.split(' ').filter(w => w.length > 2);
+        const addressNorm = normalize(address);
 
         async function performSearch(query) {
-            console.log(`Searching for: ${query}`);
+            console.log(`  Searching: ${query}`);
             const searchQuery = encodeURIComponent(query);
             await page.goto(`https://www.google.com/maps/search/${searchQuery}`, { waitUntil: 'load' });
-
-            const searchInstead = page.locator('button:has-text("Search instead for")');
-            if (await searchInstead.isVisible()) {
-                await searchInstead.click();
-                await page.waitForLoadState('networkidle');
-            }
 
             try {
                 await Promise.race([
@@ -40,7 +35,7 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
             if (await feed.isVisible()) {
                 const results = page.locator('div[role="article"] a[href*="/maps/place/"]');
                 const count = await results.count();
-                
+
                 let bestMatchIndex = -1;
                 let bestScore = 0;
 
@@ -52,9 +47,9 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                     for (const word of targetWords) {
                         if (normalizedText.includes(word)) score += 5;
                     }
-                    
+
                     if (normalizedText === targetNorm || normalizedText.includes(targetNorm)) score += 10;
-                    
+
                     if (score > bestScore) {
                         bestScore = score;
                         bestMatchIndex = i;
@@ -67,20 +62,25 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 }
             }
 
-            // Wait for business name to load (not networkidle - Maps never stops loading tiles)
+            // Wait for panel to load - wait for specific element, not networkidle
             await page.waitForSelector('h1.DUwDvf, h1.fontHeadlineLarge', { state: 'visible', timeout: 10000 }).catch(() => {});
             await page.waitForTimeout(2000);
 
-            const currentTitle = await page.evaluate(() => {
+            // Validate: h1 panel must be the business we want
+            const panelData = await page.evaluate(() => {
                 const h1 = document.querySelector('h1.DUwDvf') || document.querySelector('h1.fontHeadlineLarge');
-                return h1 ? h1.innerText.trim() : '';
+                const addressEl = document.querySelector('button[data-item-id="address"]') ||
+                                 document.querySelector('button[aria-label*="Dirección"]');
+                return {
+                    title: h1 ? h1.innerText.trim() : '',
+                    panelAddress: addressEl ? addressEl.innerText.trim() : ''
+                };
             });
-            
-            const currentNorm = normalize(currentTitle);
+
+            const currentNorm = normalize(panelData.title);
             const matchedWords = targetWords.filter(w => currentNorm.includes(w));
             const matchRatio = targetWords.length > 0 ? matchedWords.length / targetWords.length : 0;
 
-            // Levenshtein distance for short names
             const levenshtein = (a, b) => {
                 const matrix = Array(b.length + 1).fill(null).map(() => Array(a.length + 1).fill(null));
                 for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
@@ -102,25 +102,37 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
             const maxLen = Math.max(targetNorm.length, currentNorm.length);
             const similarity = 1 - distance / maxLen;
 
-            // Match if: high word overlap OR high similarity OR exact substring match
-            const matched = matchRatio >= 0.6 || similarity >= 0.75 ||
-                           targetNorm.includes(currentNorm) || currentNorm.includes(targetNorm);
+            // Address validation: at least one address word must match panel address
+            let addressMatch = true;
+            if (panelData.panelAddress && address) {
+                const panelAddrNorm = normalize(panelData.panelAddress);
+                const addrWords = addressNorm.split(' ').filter(w => w.length > 3 && !/guadalajara|jalisco|mexico/.test(w));
+                const addrMatched = addrWords.filter(w => panelAddrNorm.includes(w));
+                if (addrWords.length > 0) {
+                    addressMatch = addrMatched.length / addrWords.length >= 0.3;
+                }
+            }
 
-            return { title: currentTitle, matchRatio, matched };
+            // Strict match: name similarity + address confirmation
+            const nameMatch = matchRatio >= 0.6 || similarity >= 0.75 ||
+                             targetNorm.includes(currentNorm) || currentNorm.includes(targetNorm);
+            const matched = nameMatch && addressMatch;
+
+            return { title: panelData.title, matchRatio, matched, similarity, addressMatch };
         }
 
-        const refinedQuery = `${businessName} ${address}`.toLowerCase().includes('guadalajara') ? 
+        const refinedQuery = `${businessName} ${address}`.toLowerCase().includes('guadalajara') ?
             `${businessName} ${address}` : `${businessName} ${address} Guadalajara`;
-        
+
         let searchResult = await performSearch(refinedQuery);
 
         if (!searchResult.matched) {
-            console.log(`  ⚠️ Name mismatch with address search. Trying name-only search...`);
+            console.log(`  ⚠️ First search failed (name: ${searchResult.similarity.toFixed(2)}, addr: ${searchResult.addressMatch}). Retrying...`);
             searchResult = await performSearch(`${businessName} Guadalajara Jalisco`);
         }
 
         if (!searchResult.matched) {
-            console.log(`  ⚠️ SKIP: "${searchResult.title}" doesn't match "${businessName}"`);
+            console.log(`  ❌ SKIP: "${searchResult.title}" ≠ "${businessName}" (sim: ${searchResult.similarity.toFixed(2)})`);
             return null;
         }
 
@@ -136,7 +148,11 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 return el ? el.getAttribute('href') : 'N/A';
             };
 
-            // Extract rating (stars)
+            // Confirm panel is open by checking h1 exists
+            const h1 = document.querySelector('h1.DUwDvf') || document.querySelector('h1.fontHeadlineLarge');
+            if (!h1) return null;
+
+            // Rating from aria-label
             const ratingElement = document.querySelector('span[role="img"][aria-label*="estrella"]') ||
                                  document.querySelector('span[role="img"][aria-label*="star"]') ||
                                  document.querySelector('div[role="img"][aria-label*="estrella"]');
@@ -147,16 +163,15 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 if (match) stars = match[1].replace(',', '.');
             }
 
-            // Extract review count - multiple strategies
+            // Review count - flexible extraction
             let reviewCount = 0;
 
-            // Strategy 1: Button selector with flexible regex (no parentheses required)
+            // Strategy 1: Buttons with review-related attributes
             const reviewButton = document.querySelector('button[jsaction*="pane.rating"]') ||
                                 document.querySelector('button[aria-label*="reseñ"]') ||
                                 document.querySelector('button[aria-label*="review"]');
             if (reviewButton) {
                 const text = reviewButton.innerText || reviewButton.getAttribute('aria-label') || '';
-                // Match "1,189 reseñas" OR "(1,189)" OR "1.189 reviews"
                 const match = text.match(/(\d[\d,\.]+)\s*(reseñas?|reviews?)?/i);
                 if (match) {
                     const num = parseInt(match[1].replace(/[,\.]/g, ''));
@@ -164,7 +179,7 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 }
             }
 
-            // Strategy 2: Scan page text - flexible (with or without parentheses)
+            // Strategy 2: Scan full page text
             if (reviewCount === 0) {
                 const bodyText = document.body.innerText;
                 const patterns = [
@@ -183,10 +198,24 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 }
             }
 
+            // Strategy 3: aria-labels with review counts
+            if (reviewCount === 0) {
+                const allElements = document.querySelectorAll('[aria-label]');
+                for (const el of allElements) {
+                    const label = el.getAttribute('aria-label') || '';
+                    const m = label.match(/(\d[\d,\.]+)\s*(reseñas?|reviews?)/i);
+                    if (m) {
+                        const num = parseInt(m[1].replace(/[,\.]/g, ''));
+                        if (!isNaN(num) && num > reviewCount && num >= 10 && num < 1000000) {
+                            reviewCount = num;
+                        }
+                    }
+                }
+            }
+
             const phone = getText('button[data-item-id^="phone:tel:"]') ||
                           getText('button[aria-label^="Teléfono"]') ||
-                          getText('button[aria-label*="phone"]') ||
-                          getText('div[data-tooltip="Copiar el número de teléfono"]');
+                          getText('button[aria-label*="phone"]');
 
             const website = getHref('a[data-item-id="authority"]') ||
                             getHref('a[aria-label^="Sitio web"]') ||
@@ -198,9 +227,7 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
 
             const photoImg = document.querySelector('button[aria-label^="Foto de"] img') ||
                              document.querySelector('button[aria-label^="Photo of"] img') ||
-                             document.querySelector('img[src*="lh3.googleusercontent.com"]') ||
-                             document.querySelector('img[src*="streetviewpixels"]') ||
-                             document.querySelector('div.Z67Byc img');
+                             document.querySelector('img[src*="lh3.googleusercontent.com"]');
 
             let photo = 'N/A';
             if (photoImg) {
@@ -229,10 +256,9 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
     }
 }
 
-async function startRepair() {
-    // Create browser pool (5 pages)
+async function startRepair(forceAll = false) {
     const browser = await chromium.launch({
-        headless: true,
+        headless: false,
         channel: 'chromium',
         args: [
             '--disable-blink-features=AutomationControlled',
@@ -240,13 +266,13 @@ async function startRepair() {
         ]
     });
     const pool = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
         const context = await browser.newContext({
             userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+            viewport: { width: 1920, height: 1080 },
             locale: 'es-MX'
         });
 
-        // Anti-detection stealth
         await context.addInitScript(() => {
             Object.defineProperty(navigator, 'webdriver', { get: () => false });
             window.chrome = { runtime: {} };
@@ -254,7 +280,7 @@ async function startRepair() {
 
         const page = await context.newPage();
 
-        // Block unnecessary resources for speed (images, fonts, analytics - NOT CSS!)
+        // Only block images and tracking - NEVER CSS or JS
         await page.route('**/*.{png,jpg,jpeg,gif,webp,svg,woff,woff2,ttf,eot}', route => route.abort());
         await page.route('**/*{google-analytics,googletagmanager,doubleclick,facebook,twitter}*', route => route.abort());
 
@@ -273,12 +299,13 @@ async function startRepair() {
     }
 
     function releasePage(pageObj) {
+        // Clean page state to prevent data contamination between searches
+        pageObj.page.goto('about:blank').catch(() => {});
         pageObj.busy = false;
     }
 
     for (const fileInfo of INPUT_FILES) {
-        const results = [];
-        console.log(`Checking for missing data in ${fileInfo.enriched}...`);
+        console.log(`\n📂 Processing ${fileInfo.enriched}...`);
 
         if (!fs.existsSync(fileInfo.enriched)) {
             console.log(`Enriched file not found, skipping: ${fileInfo.enriched}`);
@@ -298,10 +325,11 @@ async function startRepair() {
 
         for (const item of dataRows) {
             const needsPhoto = !item.photo || item.photo === 'N/A';
-            const needsMapsUrl = !item['📍 Google Maps'] || item['📍 Google Maps'] === 'N/A'; 
+            const needsMapsUrl = !item['📍 Google Maps'] || item['📍 Google Maps'] === 'N/A';
+            const needsRepair = forceAll || needsPhoto || needsMapsUrl;
 
-            if (needsPhoto || needsMapsUrl) {
-                console.log(`Enriching: ${item['Negocio']}`);
+            if (needsRepair) {
+                console.log(`\n🔍 ${item['Negocio']}`);
                 const pageObj = await getFreePage();
                 const extra = await scrapeBusinessDataPlaywright(item['Negocio'], item['Dirección'], pageObj.page);
                 releasePage(pageObj);
@@ -309,15 +337,14 @@ async function startRepair() {
                 if (extra) {
                     const updated = { ...item };
                     if (extra.photo && extra.photo !== 'N/A') updated.photo = extra.photo;
-                    if (extra.mapsUrl) {
+                    if (extra.mapsUrl && extra.mapsUrl.includes('/maps/place/')) {
                         updated['📍 Google Maps'] = extra.mapsUrl;
-                        console.log(`  ✅ Maps URL verified`);
+                        console.log(`  ✅ Maps URL`);
                     }
                     if (extra.phone && extra.phone !== 'N/A') updated.phone = extra.phone;
                     if (extra.website && extra.website !== 'N/A') updated.website = extra.website;
                     if (extra.hours && extra.hours !== 'N/A') updated.hours = extra.hours;
 
-                    // Update rating and review count from scrape
                     if (extra.stars && extra.stars !== 'N/A') {
                         updated['⭐'] = extra.stars;
                         console.log(`  ✅ Rating: ${extra.stars}★`);
@@ -330,11 +357,10 @@ async function startRepair() {
                     repairedData.push(updated);
                     repairedCount++;
                 } else {
-                    // Verification failed - keep existing data (might be transient failure)
-                    console.log(`  ⚠️ Verification failed for: ${item['Negocio']} - keeping existing data`);
+                    console.log(`  ⚠️ Verification failed - keeping existing data`);
                     repairedData.push(item);
                 }
-                await new Promise(r => setTimeout(r, 1000));
+                await new Promise(r => setTimeout(r, 1500));
             } else {
                 repairedData.push(item);
             }
@@ -347,19 +373,19 @@ async function startRepair() {
                 header: headers
             });
             await csvWriter.writeRecords(repairedData);
-            console.log(`Updated ${fileInfo.enriched} with ${repairedCount} new entries.`);
+            console.log(`\n✅ Updated ${fileInfo.enriched} (${repairedCount} entries)`);
         } else {
-            console.log(`No new data found for ${fileInfo.enriched}`);
+            console.log(`\nNo changes for ${fileInfo.enriched}`);
         }
     }
 
-    // Clean up browser pool
     await browser.close();
-    console.log("Repair process completed.");
+    console.log("\n✅ Repair complete.");
 }
 
 if (require.main === module) {
-    startRepair();
+    const forceAll = process.argv.includes('--force');
+    startRepair(forceAll);
 }
 
 module.exports = { scrapeBusinessDataPlaywright };
