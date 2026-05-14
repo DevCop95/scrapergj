@@ -168,7 +168,7 @@
             const response = await fetch(url);
             if (!response.ok) throw new Error('File not found');
             const csvText = await response.text();
-            
+
             return new Promise((resolve) => {
                 Papa.parse(csvText, {
                     header: true,
