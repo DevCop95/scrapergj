@@ -16,7 +16,7 @@ Guía interactiva de los mejores negocios de comida en Guadalajara, Jalisco.
 
 - ✅ **90 negocios verificados** con datos completos de Google Maps
 - ✅ **Sistema Top 10**: Ranking por número de reseñas (👑 badge especial)
-- ✅ **89/90 negocios** con review count (99% cobertura)
+- ✅ **90/90 negocios** con review count (100% cobertura)
 - ✅ Fotos reales, teléfonos, horarios, precios
 - ✅ Búsqueda fuzzy con tolerancia a errores
 - ✅ Modo oscuro/claro
