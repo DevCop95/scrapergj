@@ -11,12 +11,22 @@ function parseNetscapeCookies(filePath) {
         if (!line.trim() || line.startsWith('#')) return;
         const parts = line.split('\t');
         if (parts.length < 7) return;
+
+        const domain = parts[0];
+        if (!domain.includes('google')) return;
+
+        const name = parts[5];
+        const value = parts[6].trim();
+        if (!name || !value) return;
+        if (name.includes('OSID') || name.startsWith('__Host-')) return;
+
+        const expires = parseInt(parts[4]);
         cookies.push({
-            name: parts[5],
-            value: parts[6].trim(),
-            domain: parts[0],
-            path: parts[2],
-            expires: parseInt(parts[4]),
+            name,
+            value,
+            domain,
+            path: parts[2] || '/',
+            expires: expires > 0 ? expires : -1,
             httpOnly: parts[3] === 'TRUE',
             secure: parts[1] === 'TRUE',
             sameSite: 'Lax'
@@ -201,32 +211,33 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 }
             }
 
-            // Strategy 2: Scan full page text
+            // Strategy 2: aria-labels with review/opinion counts
             if (reviewCount === 0) {
-                const bodyText = document.body.innerText;
-                const patterns = [
-                    /(\d[\d,\.]+)\s*reseñas?/gi,
-                    /(\d[\d,\.]+)\s*reviews?/gi
-                ];
-
-                for (const pattern of patterns) {
-                    const matches = [...bodyText.matchAll(pattern)];
-                    for (const m of matches) {
+                const allElements = document.querySelectorAll('[aria-label]');
+                for (const el of allElements) {
+                    const label = el.getAttribute('aria-label') || '';
+                    const m = label.match(/(\d[\d,\.]+)\s*(reseñas?|reviews?|opiniones?)/i);
+                    if (m) {
                         const num = parseInt(m[1].replace(/[,\.]/g, ''));
-                        if (!isNaN(num) && num > reviewCount && num >= 10 && num < 1000000) {
+                        if (!isNaN(num) && num > reviewCount && num >= 1 && num < 1000000) {
                             reviewCount = num;
                         }
                     }
                 }
             }
 
-            // Strategy 3: aria-labels with review counts
+            // Strategy 3: Scan full page text
             if (reviewCount === 0) {
-                const allElements = document.querySelectorAll('[aria-label]');
-                for (const el of allElements) {
-                    const label = el.getAttribute('aria-label') || '';
-                    const m = label.match(/(\d[\d,\.]+)\s*(reseñas?|reviews?)/i);
-                    if (m) {
+                const bodyText = document.body.innerText;
+                const patterns = [
+                    /(\d[\d,\.]+)\s*reseñas?/gi,
+                    /(\d[\d,\.]+)\s*reviews?/gi,
+                    /(\d[\d,\.]+)\s*opiniones?/gi
+                ];
+
+                for (const pattern of patterns) {
+                    const matches = [...bodyText.matchAll(pattern)];
+                    for (const m of matches) {
                         const num = parseInt(m[1].replace(/[,\.]/g, ''));
                         if (!isNaN(num) && num > reviewCount && num >= 10 && num < 1000000) {
                             reviewCount = num;
