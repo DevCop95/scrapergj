@@ -196,8 +196,28 @@
                             maps: item['📍 Google Maps'] || 'N/A',
                             phone: item['phone'] || 'N/A',
                             hours: item['hours'] || 'N/A',
-                            photo: item['photo'] || ''
+                            photo: item['photo'] || '',
+                            reviewCount: item['reviewCount'] || '0',
+                            fullHours: item['fullHours'] || 'N/A',
+                            priceLevel: item['priceLevel'] || 'N/A',
+                            category: item['category'] || 'N/A',
+                            isTop10: item['isTop10'] === 'true'
                         }));
+
+                        // Sort: top 10 first (by reviewCount), then rest by rating
+                        dataStore[key].sort((a, b) => {
+                            if (a.isTop10 && !b.isTop10) return -1;
+                            if (!a.isTop10 && b.isTop10) return 1;
+
+                            // Within top 10: sort by reviewCount
+                            if (a.isTop10 && b.isTop10) {
+                                const aReviews = parseInt(a.reviewCount) || 0;
+                                const bReviews = parseInt(b.reviewCount) || 0;
+                                if (bReviews !== aReviews) return bReviews - aReviews;
+                            }
+
+                            return parseFloat(b.rating) - parseFloat(a.rating);
+                        });
                         resolve();
                     },
                     error: (error) => {
@@ -252,7 +272,13 @@
             const hasPhoto = item.photo && item.photo !== 'N/A';
             
             return `
-                <div class="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all group">
+                <div class="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-sm border ${item.isTop10 ? 'border-amber-400 dark:border-amber-600 ring-2 ring-amber-200 dark:ring-amber-900/50' : 'border-gray-100 dark:border-gray-700'} hover:shadow-md transition-all group relative">
+                    ${item.isTop10 ? `
+                    <div class="absolute top-0 left-0 z-10 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-3 py-1 rounded-br-xl text-xs font-bold flex items-center gap-1 shadow-lg">
+                        <i class="fa-solid fa-crown"></i>
+                        <span>Top Cliente</span>
+                    </div>
+                    ` : ''}
                     ${hasPhoto ? `
                     <div class="h-40 w-full overflow-hidden">
                         <img src="${item.photo}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
@@ -261,14 +287,21 @@
                     <div class="p-5">
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex-1">
-                                <h3 class="font-bold text-lg group-hover:text-primary transition-colors">${item.name}</h3>
+                                <h3 class="font-bold text-lg group-hover:text-primary transition-colors ${item.isTop10 ? 'text-amber-700 dark:text-amber-400' : ''}">${item.name}</h3>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                     <i class="fa-solid fa-location-dot mr-1"></i>${item.address}
                                 </p>
                             </div>
-                            <span class="flex items-center px-2 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-lg border border-amber-100 dark:border-amber-800">
-                                <i class="fa-solid fa-star mr-1 text-[10px]"></i>${item.rating}
-                            </span>
+                            <div class="flex flex-col items-end gap-1">
+                                <span class="flex items-center px-2 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-lg border border-amber-100 dark:border-amber-800">
+                                    <i class="fa-solid fa-star mr-1 text-[10px]"></i>${item.rating}
+                                </span>
+                                ${item.reviewCount && item.reviewCount !== '0' ? `
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">
+                                    ${parseInt(item.reviewCount).toLocaleString()} reseñas
+                                </span>
+                                ` : ''}
+                            </div>
                         </div>
                         
                         <div class="space-y-2 mb-5">
@@ -282,7 +315,12 @@
                                 <span>${item.phone}</span>
                             </div>
                             ` : ''}
-                            ${item.hours !== 'N/A' ? `
+                            ${item.isTop10 && item.fullHours !== 'N/A' ? `
+                            <div class="flex items-start text-sm text-gray-600 dark:text-gray-300">
+                                <i class="fa-solid fa-clock w-5 mt-1 text-gray-400 dark:text-gray-500"></i>
+                                <span class="flex-1 text-xs">${item.fullHours.replace(/\|/g, '<br>')}</span>
+                            </div>
+                            ` : item.hours !== 'N/A' ? `
                             <div class="flex items-start text-sm text-gray-600 dark:text-gray-300">
                                 <i class="fa-solid fa-clock w-5 mt-1 text-gray-400 dark:text-gray-500"></i>
                                 <span class="flex-1">${item.hours}</span>
