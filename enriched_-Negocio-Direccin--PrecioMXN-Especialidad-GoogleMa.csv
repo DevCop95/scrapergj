@@ -1,12 +1,33 @@
 #,Negocio,Dirección,⭐,💰 Precio (MXN),📝 Especialidad,📍 Google Maps,phone,hours,website,photo,plusCode,isTop10,reviewCount,fullHours,priceLevel,category
 1,Taco Fish Paz,"Av. de la Paz 494, Gdl",4.7,$25–$35 c/taco,"Más de 20,000 votos en Google",https://www.google.com/maps/search/Taco%20Fish%20Paz%20Av.%20de%20la%20Paz%20494%2C%20Gdl%20Guadalajara,"
-+52 33 1653 8934",N/A,http://tacofishlapaz.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAEXdUAqDLkt-HaI4K1ZHXdEIwO_6l-rrxrbDICKxi600h-JwqaQSMgwZU6GMA_gD1DFv87SlAa0J6hgAeKO69rtcBG14e_KqnZHlw402TyqX4J4k5XC2pTLTKyEcJPhDmASwYawWb2YwA8=w1000-h1000-k-no,N/A,true,20000,,,
++52 33 1653 8934",N/A,http://tacofishlapaz.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAHxXhf47PXiv1q8KBUWp5_PtoLHlxw98zvJKQwJ4f9hUpOwCSc9ST6XR9OqhUnl0ynpRRpOQCE__4hGx8CKfFv3rW09J367H7DniuZ8NyH2GoyikA_eJMR7tG4NpSToCnm_xlH1cj7JOyc=w1000-h1000-k-no,N/A,true,20000,,,
 2,Tomate Taquería,Av. Chapultepec Sur 361,4.7,$25–$40 c/taco,"17,500+ reseñas de clientes",https://www.google.com/maps/search/Tomate%20Taquer%C3%ADa%20Av.%20Chapultepec%20Sur%20361%20Guadalajara,"
-+52 33 3825 3331",N/A,http://tomatetaqueria.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAG-HbTWJ-Bkmh6zwWitfRV7Nzm4vzFtoHZ87KKhP9b_l8-vaIeNXjIa4Ek5xuFdAs6okuG9PzrGitMBph85g6uI6HPIkuNnHzAU3rHpzQQ5zUUAZNv0CY1m3cqdkSZ_u0qtYECc8g=w1000-h1000-k-no,N/A,true,17500,,,
-15,Tacos Los Alteños,"Av. Tepeyac, Zapopan",4.7,$100–$200,Tacos al pastor y lengua,"https://www.google.com/maps/place/Los+Alte%C3%B1os/@20.6615457,-103.4033149,17z/","
-+52 33 3121 6712",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGNUFUVX-t6DKTXCGImzY7wY62lwFTO8qC0d-2030Rm7XEEBPgp-1EXnoAzw6yuYuTou-i4e0gqgIfV5-vnUARZwp-s4puyI3hF_lszIv0XWZa8wgK1C9JunsOzz5PHEy1yn8XF=w1000-h1000-k-no,N/A,true,11189,N/A,N/A,N/A
-20,Tacos Los Generales,Av. López Mateos Sur,4.5,$20–$28 c/taco,Taquería de paso muy concurrida,"https://www.google.com/maps/place/Tacos+Los+Gavilanes/@20.5751849,-103.5253086,13z/data=!4m10!1m2!2m1!1sTacos+Los+Generales+Av.+L%C3%B3pez+Mateos+Sur+Guadalajara+Jalisco!3m6!1s0x8428abfec59edcb9:0x5cc343c75518b892!8m2!3d20.5751849!4d-103.4532108!15sCj1UYWNvcyBMb3MgR2VuZXJhbGVzIEF2LiBMw7NwZXogTWF0ZW9zIFN1ciBHdWFkYWxhamFyYSBKYWxpc2NvWj4iPHRhY29zIGxvcyBnZW5lcmFsZXMgYXYgbMOzcGV6IG1hdGVvcyBzdXIgZ3VhZGFsYWphcmEgamFsaXNjb5IBCnJlc3RhdXJhbnSaAURDaTlEUVVsUlFVTnZaRU5vZEhsalJqbHZUMnN4ZUZWRVJtMWhSV1JIVkcxMFIxbFZXbGhTU0d4bVpHc3hiRTlYWXhBQuABAPoBBAgAED4!16s%2Fg%2F11xclj8s7n?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D","
-+52 33 1030 2579",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGhf1bzGFqj0-Jn1VRSN2hhJ4kcf1Rl6a5dhMiorq1EgT0QxCGU8mGN78eBs-PqMYVWXyvuBH2VbhEl6EJeomk6zZQIs1oq18eJb-tX1ghgdPwoMBfDHiiU5oXx2YG0v2kwL5BNOyQkEQF1=w800-h800-k-no,N/A,true,11189,N/A,N/A,N/A
++52 33 3825 3331","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+",http://tomatetaqueria.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAExWMvt7i4TZmv-KDgwVhz9_NX9JFayQY0C86k0hSLyKoHy7jeISHfmIlpH5TuQvy76134ObpaVQ2GjTZm1OiATFLxAdrIvM0CwkSwYU_e7VcuXP-j3hFBIsOHHH471jYFpPehvyT16_NfS=w1000-h1000-k-no,N/A,true,17500,,,
+15,Tacos Los Alteños,"Av. Tepeyac, Zapopan",4.7,$100–$200,Tacos al pastor y lengua,https://www.google.com/maps/search/Tacos%20Los%20Alte%C3%B1os%20Av.%20Tepeyac%2C%20Zapopan%20Guadalajara,"
++52 33 3121 6712","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+12a.m.
+",N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGNUFUVX-t6DKTXCGImzY7wY62lwFTO8qC0d-2030Rm7XEEBPgp-1EXnoAzw6yuYuTou-i4e0gqgIfV5-vnUARZwp-s4puyI3hF_lszIv0XWZa8wgK1C9JunsOzz5PHEy1yn8XF=w1000-h1000-k-no,N/A,true,11189,N/A,N/A,N/A
 12,Anita Li,"Av. México 2903, Vallarta Nte",4.6,$35–$55 c/taco,Taco de camarón en jícama,https://www.google.com/maps/search/Anita%20Li%20Guadalajara%20Jalisco,"
 +52 33 3647 4757",N/A,http://anitali.mx/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAEOiTBr__xInfD4keO2vI7luokXCJ22E6BthvaIUNlgOfwf0FwmWbhcz6k6uZJHxX7Z9KiSRQIYgaN12Vgo7qn_vDrJWIRzif5hbOF_IP0GpC3nox5Vfx3DkDtXYlZAodcwlLS9T7AGFqWi=w1000-h1000-k-no,N/A,true,7795,N/A,N/A,N/A
 3,Tripitas Don Ramón,Calle Chiapas 1538,4.5,$20–$28 c/taco,"7,700+ reseñas; especialistas en tripa",https://www.google.com/maps/search/Tripitas%20Don%20Ram%C3%B3n%20Calle%20Chiapas%201538%20Guadalajara,"
@@ -19,7 +40,7 @@
 26,Tacos El Vaquero,Tlajomulco Centro,4.5,$20–$28 c/taco,Especialidad en carne asada,https://www.google.com/maps/search/Tacos%20El%20Vaquero%20Guadalajara%20Jalisco,"
 +52 33 1683 0548",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAFchRMsf8pPHdFzov1-cODxUTncKwPtVmL8LcnqskpoLLq9ZNvBQU7IJPq9XIR2fHTYXDVijDg8Gs_5SDF4mDuevUxCuNDf1nGkGNp8TTE61S1m-KA_vwvFflRRuGIg8R_uUA6M=w1000-h1000-k-no,N/A,true,4970,N/A,N/A,N/A
 14,Taquería Orinoco,"Av. Libertad 1890, Americana",4.4,$28–$45 c/taco,Chicharrón de Rib Eye estilo norteño,https://www.google.com/maps/search/Taquer%C3%ADa%20Orinoco%20Guadalajara%20Jalisco,"
-+52 55 5584 0845",N/A,http://www.taqueriaorinoco.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAF7os4AjJXPxDWkYl8ymS9doyf5B3xPGboUJbw27MZbFPSKHeaSlQJBf9DCvZgn9Snm8rRiIGqBwx3UtexOQ6vPrQQkLeee_SGDycJNIBEKmMp4n8djUjsXZcWG8kHMJoHpQ_gkF94bVUY=w1000-h1000-k-no,N/A,false,3112,N/A,N/A,N/A
++52 55 5584 0845",N/A,http://www.taqueriaorinoco.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAF7os4AjJXPxDWkYl8ymS9doyf5B3xPGboUJbw27MZbFPSKHeaSlQJBf9DCvZgn9Snm8rRiIGqBwx3UtexOQ6vPrQQkLeee_SGDycJNIBEKmMp4n8djUjsXZcWG8kHMJoHpQ_gkF94bVUY=w1000-h1000-k-no,N/A,true,3112,N/A,N/A,N/A
 5,Forastero Chivastian,Av. Manuel Ávila Camacho 1800,4.6,$25–$35 c/taco,Barbacoa de alta calidad,https://www.google.com/maps/search/Forastero%20Chivastian%20Av.%20Manuel%20%C3%81vila%20Camacho%201800%20Guadalajara,"
 +52 33 3839 4401",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAEshiADkx-HkLe3uUO9WQiu5uR3R5KE0VTiE6iunQ9Y7dLfcsmuQRxUkE8pV5QnfJXPAIf3Td_W1ivksbUoqUhoze9_gEOq7mhREveopugFw8kmPbDJqRAexuWPDVEX3t2ggd-xEQ=w1000-h1000-k-no,N/A,false,2969,,,
 29,Tacos El Abuelo,Colonia Miravalle,4.3,$18–$22 c/taco,Precio económico y alta rotación,"https://www.google.com/maps/place/Birrieria+El+Abuelo/@20.6787607,-103.3928568,13z/data=!4m10!1m2!2m1!1sTacos+El+Abuelo+Guadalajara!3m6!1s0x8428adcdf1545849:0x465b5da533033c27!8m2!3d20.6787607!4d-103.320759!15sChtUYWNvcyBFbCBBYnVlbG8gR3VhZGFsYWphcmFaHSIbdGFjb3MgZWwgYWJ1ZWxvIGd1YWRhbGFqYXJhkgERZmFtaWx5X3Jlc3RhdXJhbnSaASNDaFpEU1VoTk1HOW5TMFZKUTBGblNVUmlYeTFETVVsbkVBReABAPoBBQigARA8!16s%2Fg%2F11rzdlbpk9?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D",N/A,N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAG3nqutDxD2lsKsOGsQIOi_fWTyhG_krBBscgDidkSTrpJFa6IgX8zpGgvd_UsTZW7A3sSlD5P7JK1oZY8S9IkD4IQfq8XcLlzma9rsvvCdZIqq96OyD9OVQn_QncVMR-o__nZI=w800-h800-k-no,N/A,false,2798,N/A,N/A,N/A
@@ -37,6 +58,8 @@
 +52 33 1602 1082",N/A,https://www.facebook.com/TacosMoyPatria/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAHZSWVdD3BYF02PJRHCch9vhXxQA8GGdy_LMTwh_5Ez-gPZQJkOHVPudnRRVsu367tKZPo7kLuZjLU1rtHjzbrxbzfIuUcUEahWphSEkPdD98mJdI6pFCgtqEdpGafip0YSezUU=w800-h800-k-no,N/A,false,1364,N/A,N/A,N/A
 21,Tacos El Primo,"Santa Anita, Tlajomulco",4.4,$18–$25 c/taco,Estilo rural con tortillas a mano,https://www.google.com/maps/search/Tacos%20El%20Primo%20Santa%20Anita%2C%20Tlajomulco%20Guadalajara,"
 +52 33 1544 4838",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAEeHmMB7M400ijvbLgA9FwYnovmqBHczlf7lKXK_7Yk2IYh6elC0XvznFraYMw05ZcNnP9Z1-kWQsyIbWyNtWh3GtPDtbdU-LJb5fU-a0M7Ah8JcNZS0-lUInaTPUaio1zl-ShN5A=w1000-h1000-k-no,N/A,false,1219,N/A,N/A,N/A
+20,Tacos Los Gavilanes,Av. López Mateos Sur,4.5,$20–$28 c/taco,Taquería de paso muy concurrida,"https://www.google.com/maps/place/Tacos+Los+Gavilanes/@20.5751849,-103.5253086,13z/data=!4m10!1m2!2m1!1sTacos+Los+Generales+Av.+L%C3%B3pez+Mateos+Sur+Guadalajara+Jalisco!3m6!1s0x8428abfec59edcb9:0x5cc343c75518b892!8m2!3d20.5751849!4d-103.4532108!15sCj1UYWNvcyBMb3MgR2VuZXJhbGVzIEF2LiBMw7NwZXogTWF0ZW9zIFN1ciBHdWFkYWxhamFyYSBKYWxpc2NvWj4iPHRhY29zIGxvcyBnZW5lcmFsZXMgYXYgbMOzcGV6IG1hdGVvcyBzdXIgZ3VhZGFsYWphcmEgamFsaXNjb5IBCnJlc3RhdXJhbnSaAURDaTlEUVVsUlFVTnZaRU5vZEhsalJqbHZUMnN4ZUZWRVJtMWhSV1JIVkcxMFIxbFZXbGhTU0d4bVpHc3hiRTlYWXhBQuABAPoBBAgAED4!16s%2Fg%2F11xclj8s7n?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D","
++52 33 1030 2579",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGhf1bzGFqj0-Jn1VRSN2hhJ4kcf1Rl6a5dhMiorq1EgT0QxCGU8mGN78eBs-PqMYVWXyvuBH2VbhEl6EJeomk6zZQIs1oq18eJb-tX1ghgdPwoMBfDHiiU5oXx2YG0v2kwL5BNOyQkEQF1=w800-h800-k-no,N/A,false,1189,N/A,N/A,N/A
 11,Tacos Estadio,Calz. Federalismo Norte 3145,4.5,$20–$28 c/taco,Estilo Ciudad de México en Gdl,https://www.google.com/maps/search/Tacos%20Estadio%20Calz.%20Federalismo%20Norte%203145%20Guadalajara,"
 +52 33 3230 4234",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGSq6p8yvu8kqQfLmH-EW8A2dnOV5GG_9qKc0RXkGO14rLkIokZJ7ZET-705E9Ayscqo5KqDPkNmWGa_ad337cvL0Nh9bXT2j0S5pNLfCuDu5kffGN7YakKMcgB5XX15mKucsjO=w1000-h1000-k-no,N/A,false,1167,N/A,N/A,N/A
 10,Los Gallitos,"Félix Palavicini, Santa Elena",4.7,$22–$30 c/taco,Tacos de guisado muy populares,https://www.google.com/maps/search/Los%20Gallitos%20F%C3%A9lix%20Palavicini%2C%20Santa%20Elena%20Guadalajara,"

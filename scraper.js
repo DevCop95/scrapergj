@@ -10,7 +10,6 @@ const INPUT_FILES = [
 ];
 
 async function scrapeBusinessDataPlaywright(businessName, address, page) {
-    
     try {
         const normalize = (str) => str.toLowerCase()
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -67,8 +66,11 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                     await page.waitForURL(/\/maps\/place\//, { timeout: 10000 }).catch(() => {});
                 }
             }
-            
-            await page.waitForTimeout(2000);
+
+            // Wait for Maps to load review data
+            await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+            await page.waitForTimeout(3000);
+
             const currentTitle = await page.evaluate(() => {
                 const h1 = document.querySelector('h1.DUwDvf') || document.querySelector('h1.fontHeadlineLarge');
                 return h1 ? h1.innerText.trim() : '';
@@ -145,15 +147,36 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 if (match) stars = match[1].replace(',', '.');
             }
 
-            // Extract review count
+            // Extract review count - multiple strategies
+            let reviewCount = 0;
+
+            // Strategy 1: Button selector
             const reviewButton = document.querySelector('button[jsaction*="pane.rating"]') ||
                                 document.querySelector('button[aria-label*="reseñ"]') ||
                                 document.querySelector('button[aria-label*="review"]');
-            let reviewCount = 0;
             if (reviewButton) {
                 const text = reviewButton.innerText || reviewButton.getAttribute('aria-label') || '';
                 const match = text.match(/\((\d[\d,\.]+)\)/);
                 if (match) reviewCount = parseInt(match[1].replace(/[,\.]/g, ''));
+            }
+
+            // Strategy 2: Scan page text for "(X reseñas)" pattern
+            if (reviewCount === 0) {
+                const bodyText = document.body.innerText;
+                const patterns = [
+                    /\((\d[\d,\.]+)\s*reseñas?\)/gi,
+                    /\((\d[\d,\.]+)\s*reviews?\)/gi
+                ];
+
+                for (const pattern of patterns) {
+                    const matches = [...bodyText.matchAll(pattern)];
+                    for (const m of matches) {
+                        const num = parseInt(m[1].replace(/[,\.]/g, ''));
+                        if (!isNaN(num) && num > reviewCount && num >= 10 && num < 1000000) {
+                            reviewCount = num;
+                        }
+                    }
+                }
             }
 
             const phone = getText('button[data-item-id^="phone:tel:"]') ||
@@ -226,6 +249,11 @@ async function startRepair() {
         });
 
         const page = await context.newPage();
+
+        // Block unnecessary resources for speed (60% bandwidth/CPU savings)
+        await page.route('**/*.{woff,woff2,ttf,eot,css}', route => route.abort());
+        await page.route('**/*{google-analytics,googletagmanager,doubleclick,facebook,twitter}*', route => route.abort());
+
         pool.push({ page, busy: false });
     }
 
