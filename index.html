@@ -204,18 +204,11 @@
                             isTop10: item['isTop10'] === 'true'
                         }));
 
-                        // Sort: top 10 first (by reviewCount), then rest by rating
+                        // Sort by reviewCount DESC, then by rating DESC
                         dataStore[key].sort((a, b) => {
-                            if (a.isTop10 && !b.isTop10) return -1;
-                            if (!a.isTop10 && b.isTop10) return 1;
-
-                            // Within top 10: sort by reviewCount
-                            if (a.isTop10 && b.isTop10) {
-                                const aReviews = parseInt(a.reviewCount) || 0;
-                                const bReviews = parseInt(b.reviewCount) || 0;
-                                if (bReviews !== aReviews) return bReviews - aReviews;
-                            }
-
+                            const aReviews = parseInt(a.reviewCount) || 0;
+                            const bReviews = parseInt(b.reviewCount) || 0;
+                            if (bReviews !== aReviews) return bReviews - aReviews;
                             return parseFloat(b.rating) - parseFloat(a.rating);
                         });
                         resolve();
@@ -421,11 +414,10 @@
 
                 // Add hyperlinks for Google Maps and Website columns
                 dataStore[cat.key].forEach((item, index) => {
-                    const row = index + 2; // +2 because header is row 1, data starts at row 2
+                    const row = index + 2;
 
-                    // Google Maps hyperlink
                     const mapsUrl = item.maps || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('"' + item.name + '" ' + item.address)}`;
-                    const mapsCell = XLSX.utils.encode_cell({ r: row - 1, c: 8 }); // column I
+                    const mapsCell = XLSX.utils.encode_cell({ r: row - 1, c: 8 });
                     worksheet[mapsCell] = {
                         t: 's',
                         v: 'Ver en Mapa',
@@ -434,28 +426,25 @@
 
                 });
 
-                // Update range to include new column
                 const range = XLSX.utils.decode_range(worksheet['!ref']);
-                range.e.c = 8; // extend to column I
+                range.e.c = 8;
                 worksheet['!ref'] = XLSX.utils.encode_range(range);
 
-                // Set column widths
                 worksheet['!cols'] = [
-                    { wch: 5 },  // #
-                    { wch: 30 }, // Negocio
-                    { wch: 40 }, // Dirección
-                    { wch: 12 }, // Calificación
-                    { wch: 15 }, // Precio
-                    { wch: 15 }, // Teléfono
-                    { wch: 25 }, // Horario
-                    { wch: 50 }, // Detalles
-                    { wch: 15 }  // Google Maps
+                    { wch: 5 },
+                    { wch: 30 },
+                    { wch: 40 },
+                    { wch: 12 },
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 25 },
+                    { wch: 50 },
+                    { wch: 15 }
                 ];
 
                 XLSX.utils.book_append_sheet(workbook, worksheet, cat.name);
             });
 
-            // Create summary sheet with totals
             const summaryData = [
                 { 'Categoría': 'Tacos y Varios', 'Total Negocios': dataStore.tacos.length },
                 { 'Categoría': 'Tortas Ahogadas', 'Total Negocios': dataStore.tortas.length },
@@ -466,11 +455,8 @@
             summarySheet['!cols'] = [{ wch: 20 }, { wch: 15 }];
             XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
 
-            // Generate filename with date
             const today = new Date().toISOString().split('T')[0];
             const filename = `GDL_Food_Guide_${today}.xlsx`;
-
-            // Download
             XLSX.writeFile(workbook, filename);
         });
 
@@ -489,7 +475,6 @@
 
             if (!foodIcon || !foodText) return;
 
-            // Rotate out
             foodIcon.style.transform = 'rotateY(90deg) scale(0.5)';
             foodIcon.style.opacity = '0';
 
@@ -498,7 +483,6 @@
                 foodIcon.textContent = foodSequence[currentFood].icon;
                 foodText.textContent = foodSequence[currentFood].text;
 
-                // Rotate in
                 setTimeout(() => {
                     foodIcon.style.transform = 'rotateY(0deg) scale(1)';
                     foodIcon.style.opacity = '1';
@@ -506,10 +490,8 @@
             }, 350);
         }
 
-        // Start food rotation immediately
         foodInterval = setInterval(rotateFood, 1200);
 
-        // Initialize App
         init();
     </script>
 </body>
