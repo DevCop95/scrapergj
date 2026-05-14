@@ -137,7 +137,6 @@
 
         async function init() {
             try {
-                // Try to load enriched files first, fallback to original if not found
                 await Promise.all([
                     loadCSV('tacos', FILES.tacos).catch(() => loadCSV('tacos', '-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv')),
                     loadCSV('tortas', FILES.tortas).catch(() => loadCSV('tortas', '-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv')),
@@ -145,14 +144,11 @@
                 ]);
                 render();
                 
-                // Keep the loading screen visible for at least 6 seconds to show full animation cycle
                 setTimeout(() => {
                     const overlay = document.getElementById('loading-overlay');
                     if (foodInterval) clearInterval(foodInterval);
                     overlay.style.opacity = '0';
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
-                    }, 500);
+                    setTimeout(() => { overlay.style.display = 'none'; }, 500);
                 }, 6000);
             } catch (error) {
                 console.error("Error loading data:", error);
@@ -174,7 +170,6 @@
                     header: true,
                     skipEmptyLines: true,
                     complete: (results) => {
-                        // Validate required columns exist
                         const requiredCols = ['Negocio', 'Dirección'];
                         const headers = results.meta.fields || [];
                         const missing = requiredCols.filter(col => !headers.includes(col));
@@ -186,7 +181,6 @@
                             return;
                         }
 
-                        // Normalize headers with defaults for missing enriched fields
                         dataStore[key] = results.data.map(item => ({
                             name: item['Negocio'] || '',
                             address: item['Dirección'] || '',
@@ -228,19 +222,16 @@
 
             let filteredData;
             if (!searchQuery) {
-                // No search query - show all
                 filteredData = dataStore[currentCategory];
             } else if (searchQuery.length < 3) {
-                // Short query - exact substring match
                 filteredData = dataStore[currentCategory].filter(item => {
                     const searchStr = `${item.name} ${item.address} ${item.detail}`.toLowerCase();
                     return searchStr.includes(searchQuery.toLowerCase());
                 });
             } else {
-                // Long query - fuzzy search
                 const fuse = new Fuse(dataStore[currentCategory], {
                     keys: ['name', 'address', 'detail'],
-                    threshold: 0.3, // 0 = exact, 1 = match anything
+                    threshold: 0.3,
                     ignoreLocation: true,
                     minMatchCharLength: 2
                 });
@@ -345,17 +336,14 @@
 
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                // Update tabs UI
                 document.querySelectorAll('.tab-btn').forEach(b => {
                     b.classList.remove('active', 'bg-primary', 'text-white', 'shadow-md');
                     b.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400', 'border-gray-200', 'dark:border-gray-700');
                     b.querySelector('i').classList.remove('text-white');
                 });
-
                 btn.classList.add('active', 'bg-primary', 'text-white', 'shadow-md');
                 btn.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400', 'border-gray-200', 'dark:border-gray-700');
                 btn.querySelector('i').classList.add('text-white');
-
                 currentCategory = btn.dataset.category;
                 render();
             });
@@ -366,7 +354,6 @@
         const themeIcon = document.getElementById('theme-icon');
         const html = document.documentElement;
 
-        // Check for saved theme
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             html.classList.add('dark');
             themeIcon.classList.replace('fa-moon', 'fa-sun');
@@ -384,11 +371,10 @@
             }
         });
 
-        // Excel Export Function
+        // Excel Export — includes Reseñas column, sorted by reviewCount DESC
         document.getElementById('export-excel').addEventListener('click', () => {
             const workbook = XLSX.utils.book_new();
 
-            // Export each category to separate sheet
             const categories = [
                 { key: 'tacos', name: 'Tacos y Varios' },
                 { key: 'tortas', name: 'Tortas Ahogadas' },
@@ -396,11 +382,13 @@
             ];
 
             categories.forEach(cat => {
+                // dataStore ya viene ordenado por reviewCount DESC desde loadCSV
                 const data = dataStore[cat.key].map((item, index) => ({
                     '#': index + 1,
                     'Negocio': item.name,
                     'Dirección': item.address,
-                    'Calificación': item.rating,
+                    'Calificación': parseFloat(item.rating) || 0,
+                    'Reseñas': parseInt(item.reviewCount) || 0,
                     'Precio': item.price,
                     'Teléfono': item.phone,
                     'Horario': item.hours,
@@ -409,37 +397,33 @@
 
                 const worksheet = XLSX.utils.json_to_sheet(data);
 
-                // Add header for link column
-                worksheet['I1'] = { t: 's', v: 'Google Maps' };
+                // Columna J = Google Maps (index 9)
+                worksheet['J1'] = { t: 's', v: 'Google Maps' };
 
-                // Add hyperlinks for Google Maps and Website columns
                 dataStore[cat.key].forEach((item, index) => {
                     const row = index + 2;
-
-                    const mapsUrl = item.maps || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('"' + item.name + '" ' + item.address)}`;
-                    const mapsCell = XLSX.utils.encode_cell({ r: row - 1, c: 8 });
-                    worksheet[mapsCell] = {
-                        t: 's',
-                        v: 'Ver en Mapa',
-                        l: { Target: mapsUrl }
-                    };
-
+                    const mapsUrl = item.maps && item.maps !== 'N/A'
+                        ? item.maps
+                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('"' + item.name + '" ' + item.address)}`;
+                    const mapsCell = XLSX.utils.encode_cell({ r: row - 1, c: 9 });
+                    worksheet[mapsCell] = { t: 's', v: 'Ver en Mapa', l: { Target: mapsUrl } };
                 });
 
                 const range = XLSX.utils.decode_range(worksheet['!ref']);
-                range.e.c = 8;
+                range.e.c = 9;
                 worksheet['!ref'] = XLSX.utils.encode_range(range);
 
                 worksheet['!cols'] = [
-                    { wch: 5 },
-                    { wch: 30 },
-                    { wch: 40 },
-                    { wch: 12 },
-                    { wch: 15 },
-                    { wch: 15 },
-                    { wch: 25 },
-                    { wch: 50 },
-                    { wch: 15 }
+                    { wch: 5 },   // #
+                    { wch: 30 },  // Negocio
+                    { wch: 40 },  // Dirección
+                    { wch: 12 },  // Calificación
+                    { wch: 12 },  // Reseñas
+                    { wch: 15 },  // Precio
+                    { wch: 15 },  // Teléfono
+                    { wch: 25 },  // Horario
+                    { wch: 50 },  // Detalles
+                    { wch: 15 }   // Google Maps
                 ];
 
                 XLSX.utils.book_append_sheet(workbook, worksheet, cat.name);
@@ -456,8 +440,7 @@
             XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
 
             const today = new Date().toISOString().split('T')[0];
-            const filename = `GDL_Food_Guide_${today}.xlsx`;
-            XLSX.writeFile(workbook, filename);
+            XLSX.writeFile(workbook, `GDL_Food_Guide_${today}.xlsx`);
         });
 
         // Animated food loading sequence
@@ -472,17 +455,13 @@
         function rotateFood() {
             const foodIcon = document.getElementById('food-icon');
             const foodText = document.getElementById('food-text');
-
             if (!foodIcon || !foodText) return;
-
             foodIcon.style.transform = 'rotateY(90deg) scale(0.5)';
             foodIcon.style.opacity = '0';
-
             setTimeout(() => {
                 currentFood = (currentFood + 1) % foodSequence.length;
                 foodIcon.textContent = foodSequence[currentFood].icon;
                 foodText.textContent = foodSequence[currentFood].text;
-
                 setTimeout(() => {
                     foodIcon.style.transform = 'rotateY(0deg) scale(1)';
                     foodIcon.style.opacity = '1';
@@ -491,7 +470,6 @@
         }
 
         foodInterval = setInterval(rotateFood, 1200);
-
         init();
     </script>
 </body>
