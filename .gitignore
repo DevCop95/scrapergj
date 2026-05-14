@@ -16,6 +16,9 @@ debug_*.js
 *_surgical.js
 *_unique.js
 
+# Credentials - NEVER commit
+cookies.txt
+
 # Logs
 *.log
 npm-debug.log*

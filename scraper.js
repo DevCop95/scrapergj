@@ -3,6 +3,28 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
+function parseNetscapeCookies(filePath) {
+    if (!fs.existsSync(filePath)) return [];
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const cookies = [];
+    content.split('\n').forEach(line => {
+        if (!line.trim() || line.startsWith('#')) return;
+        const parts = line.split('\t');
+        if (parts.length < 7) return;
+        cookies.push({
+            name: parts[5],
+            value: parts[6].trim(),
+            domain: parts[0],
+            path: parts[2],
+            expires: parseInt(parts[4]),
+            httpOnly: parts[3] === 'TRUE',
+            secure: parts[1] === 'TRUE',
+            sameSite: 'Lax'
+        });
+    });
+    return cookies;
+}
+
 const INPUT_FILES = [
     { path: '-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv', enriched: 'enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv' },
     { path: '-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv', enriched: 'enriched_-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv' },
@@ -265,6 +287,15 @@ async function startRepair(forceAll = false) {
             '--disable-dev-shm-usage'
         ]
     });
+
+    // Load Google cookies for authenticated session (bypasses "vista limitada")
+    const googleCookies = parseNetscapeCookies('./cookies.txt');
+    if (googleCookies.length > 0) {
+        console.log(`🍪 Loaded ${googleCookies.length} cookies (authenticated mode)`);
+    } else {
+        console.log('⚠️ No cookies.txt found - running without auth (limited data)');
+    }
+
     const pool = [];
     for (let i = 0; i < 3; i++) {
         const context = await browser.newContext({
@@ -272,6 +303,10 @@ async function startRepair(forceAll = false) {
             viewport: { width: 1920, height: 1080 },
             locale: 'es-MX'
         });
+
+        if (googleCookies.length > 0) {
+            await context.addCookies(googleCookies);
+        }
 
         await context.addInitScript(() => {
             Object.defineProperty(navigator, 'webdriver', { get: () => false });
