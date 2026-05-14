@@ -1,10 +1,32 @@
 #,Negocio,Dirección,⭐,💰 Precio (MXN),📝 Observaciones,📍 Google Maps,phone,hours,website,photo,plusCode,isTop10,reviewCount,fullHours,priceLevel,category
 10,Tortas La Chata,"Av. Corona 126, Centro",4.4,$60–$75,Cocina tapatía tradicional,https://www.google.com/maps/search/Tortas%20La%20Chata%20Av.%20Corona%20126%2C%20Centro%20Guadalajara,"
 +52 33 3613 0588",N/A,http://lachata.com.mx/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAF-6x_i0Ty8NeFRhjw5y_8teQg7nkEyXq5BURXeVoURQtFKPl1xXERSmmJ9VQIbRv3lVqSg-PmCX4vX0C4eWhWH0ETH-6iaD9hIR1gSX7YFkK0PTiRhwB3JGkJqYW4XeV-0AKALYg3T3v47=w1000-h1000-k-no,N/A,true,23066,N/A,N/A,N/A
-9,José de Bicicleta,"Mexicaltzingo 27, Guadalajara",4.8,$80–$100,Punto histórico de la ciudad,https://www.google.com/maps/search/Jos%C3%A9%20de%20Bicicleta%20Mexicaltzingo%2027%2C%20Guadalajara,"
-+52 33 2200 9970",N/A,https://tortaslabicicleta.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAEzai_0TkNF--xrTdYH1xH1qiczR1FhV2p4J_x-DPDw2Wb1FiUh3w9DOHKuDNAQO3FG3j9Hnngxh0Z_LPVR51S3cIINc7AaegE92t_tspZuskhipkgecpB8RlN8Bmssu9xPFxH9=w1000-h1000-k-no,N/A,true,6537,N/A,N/A,N/A
+9,José de Bicicleta,"Mexicaltzingo 27, Guadalajara",4.3,$80–$100,Punto histórico de la ciudad,https://www.google.com/maps/search/Jos%C3%A9%20de%20Bicicleta%20Mexicaltzingo%2027%2C%20Guadalajara,"
++52 33 2200 9970","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+",https://tortaslabicicleta.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAE6Ddge4DTbBrktJMsvzmpI5Kt20rILOX9HcR6CGM6J872x9bqBFlnJFu4kpiXul7MS13iBGN8YpAM9U5zoPEpKH4B4tPmYdb7lUdn3cNez24I8iu6V7R8apZ74kafFn9riCgro=w1000-h1000-k-no,N/A,true,6536,N/A,N/A,N/A
 5,Ahogadas de Sánchez,"Alfredo Plascencia 648, Santa Tere",4.6,$65–$80,Favorita por su sabor tradicional,https://www.google.com/maps/search/Ahogadas%20de%20S%C3%A1nchez%20Alfredo%20Plascencia%20648%2C%20Santa%20Tere%20Guadalajara,"
-+52 33 3615 1642",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAFtavwkLoe9lZSQSJNEOszPJze1-Dwr_RohE1YDkQfpy8ioCCoKy3VdfZk9ydG6jjGF3AFnw3Gj0IVSAYM9Bqm10EpyyA8e4S1QpmqiGCEvNz6dN9nIZWACKuE3IUyrXyHaoDK9xg=w1000-h1000-k-no,N/A,true,6536,,,
++52 33 3615 1642","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+",N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAFtavwkLoe9lZSQSJNEOszPJze1-Dwr_RohE1YDkQfpy8ioCCoKy3VdfZk9ydG6jjGF3AFnw3Gj0IVSAYM9Bqm10EpyyA8e4S1QpmqiGCEvNz6dN9nIZWACKuE3IUyrXyHaoDK9xg=w1000-h1000-k-no,N/A,true,6536,,,
 6,El Príncipe Heredero,"Cerca de Sears, Centro Histórico",4.6,$70–$90,Legendaria por su salsa,https://www.google.com/maps/search/El%20Pr%C3%ADncipe%20Heredero%20Cerca%20de%20Sears%2C%20Centro%20Hist%C3%B3rico%20Guadalajara,"
 +52 33 3138 3162",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAEpA_ibcZA7To62mKwh8Q6w5yu2oVwRyQc9YDXvb74xqIKPqy2rdc3prlgH5-qzFNAP6NSdelUDTf-F17wyR-EnmNnUpXt1cst5eKyP6OTudgSzGE7zicrrK-AIFEZ77qIsFtVpOw=w1000-h1000-k-no,N/A,true,6536,,,
 17,Ahogadas Sánchez (Parra),"Eulogio Parra, Santa Tere",4.6,$65–$80,Clásico de la cocina callejera,https://www.google.com/maps/search/Ahogadas%20S%C3%A1nchez%20(Parra)%20Guadalajara%20Jalisco,"
@@ -39,8 +61,19 @@ miércoles
 6p.m.
 9p.m.
 ",http://www.tortastono.com.mx/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAF-64a4RqlkEqvjOTfYZisZizwp-xVZMS2M7eRfoSt1IkRsy8bGHVIIk-BvN5RonSQvQWNxjX2jbLczXbMTvm8ovFv4LjjUSE0QkN7jOR482yrhoM6NuZm1YWj93qOjE8JZ-rfKTKjFNCQ=w1000-h1000-k-no,N/A,true,4768,,,
-8,Ahogadas Colomos,"José María Vigil 1874, Gdl",4.5,$70–$85,Carnitas jugosas y generosas,https://www.google.com/maps/search/Ahogadas%20Colomos%20Jos%C3%A9%20Mar%C3%ADa%20Vigil%201874%2C%20Gdl%20Guadalajara,"
-+52 33 3640 0290",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAFyKRyPQ-9B--sz2Gn0ucE1Fb2QdtzW7XsqOeVu1edzdm_7R_XTA0nhRBoe-wr5seqaH6UAP6Op_loVyHf8OktSlb3909jWFpXje8IHaVQ5iLQCoknujktkN7z7t45IQsQ2rCU6=w1000-h1000-k-no,N/A,true,4767,N/A,N/A,N/A
+8,Ahogadas Colomos,"José María Vigil 1874, Gdl",4.4,$70–$85,Carnitas jugosas y generosas,"https://www.google.com/maps/place/Tortas+Ahogadas+Colomos/@20.6899165,-103.37281,17z/data=!3m1!4b1!4m6!3m5!1s0x8428ae3d01f5a5ed:0xb841b2e2ca2384e!8m2!3d20.6899165!4d-103.37281!16s%2Fg%2F1tggtvjc?entry=ttu&g_ep=EgoyMDI2MDUxMS4wIKXMDSoASAFQAw%3D%3D","
++52 33 3640 0290","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+",N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGcmXEV2vMn8ZSb3NFBD1B2dPh9nnBZIpvbAT4MbVJVZjAGUPWJDHi6Jq5iedszniiTR0DaNKC4I0n4ZESD4R7EmCxSG96cXu6htHRIQ9StMlMRDB3Ucej7sitxWFHz8noVpyhU=w1000-h1000-k-no,N/A,true,4767,N/A,N/A,N/A
 25,Tortas Las Originales,Av. Niños Héroes,4.4,$60–$75,Receta clásica sin variantes,"https://www.google.com/maps/place/Las+Originales+TORTAS+AHOGADAS+Jos%C3%A9/@20.66596,-103.4225618,13z/data=!4m10!1m2!2m1!1sTortas+Las+Originales+Av.+Ni%C3%B1os+H%C3%A9roes+Guadalajara+Jalisco!3m6!1s0x8428b1f88425134f:0xe94e7838fb00df10!8m2!3d20.66596!4d-103.350464!15sCjxUb3J0YXMgTGFzIE9yaWdpbmFsZXMgQXYuIE5pw7FvcyBIw6lyb2VzIEd1YWRhbGFqYXJhIEphbGlzY29aPSI7dG9ydGFzIGxhcyBvcmlnaW5hbGVzIGF2IG5pw7FvcyBow6lyb2VzIGd1YWRhbGFqYXJhIGphbGlzY2-SARhtZXhpY2FuX3RvcnRhX3Jlc3RhdXJhbnSaASRDaGREU1VoTk1HOW5TMFZKUTBGblRVUm5ObDloZURKM1JSQULgAQD6AQQIABBC!16s%2Fg%2F1q2wkyc_p?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D","
 +52 33 3596 1614",N/A,https://tortaslabicicleta.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAFPsr1iFjU6ky6hzismLlt9eYlh1QRe2JTzPpsXnvpgywPxeXnR7SCmSz9_r1lhKxBygmOvl7E61IkrIIKI3jttuGEHt9TRIeJ4Z0kUkRkE4eMblFacA00vDJY9mikHPBOltri7=w800-h800-k-no,N/A,false,4540,N/A,N/A,N/A
 23,Tortas Las Famosas,"Varias Sucursales, ZMG",4.3,$60–$75,Modelo de franquicia exitoso,"https://www.google.com/maps/search/Tortas+Las+Famosas+Varias+Sucursales,+ZMG+Guadalajara/@20.5999181,-103.3593637,12z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI2MDUxMS4wIKXMDSoASAFQAw%3D%3D","
@@ -50,25 +83,80 @@ miércoles
 1,Ahogadas Betos,"Calle Morelos, Guadalajara",4.7,$70–$85,Campeona digital en Google Maps,https://www.google.com/maps/search/Ahogadas%20Betos%20Calle%20Morelos%2C%20Guadalajara,"
 +52 33 3342 0529",N/A,https://www.ahogadasbetos.com/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAFJ-VoILtBI27HUYFomgp-GAT4qK3IRJak3I6zTqQu9TuBXkM-4QuliFRMbS9uYm_mbhg5cXhm0j_tM0d0W7aj6KbIuKsNZuvTYhnjdEy9bbToypwIl9ZprxbjQKQ4fkBybJuJPGkrhdgsX=w1000-h1000-k-no,N/A,false,3147,,,
 27,Tortas El Chacal,"Zona Oblatos, Guadalajara",4.4,$60–$75,Muy popular en el oriente,https://www.google.com/maps/search/Tortas%20El%20Chacal%20Guadalajara%20Jalisco,N/A,N/A,https://www.facebook.com/chacalgdl/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAHF_daZZSWNlKoxSAOgJV6nT1VUnF-yO2ZW_jVUGVRdBTzjT1ERBVcFJlpnL4gLt4V_2__14UH2fRn9F8oFRTJ8tzQJMv0casdTlPltxxK_9Rq_6zLWCVf_Iyo7B7MDeESb3ZMLZQ=w1000-h1000-k-no,N/A,false,2933,N/A,N/A,N/A
-21,Ahogadas Arduro,"Zona Industrial, Guadalajara",4.4,$60–$75,Servicio enfocado a trabajadores,"https://www.google.com/maps/place/Tortas+Ahogadas+Arduro/@20.6402821,-103.3597253,17z/data=!3m1!4b1!4m6!3m5!1s0x8428b27563c5b035:0x4d7d3efd7fc15c1d!8m2!3d20.6402821!4d-103.3597253!16s%2Fg%2F12hnz66l3?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D","
-+52 33 3104 3577",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAEhP5xXtwi-RpvxDP9xnapfEh1943IUT0fMrW-uDqSrE6wSiqbn90rPgWXUn4UnQUHZIwai_I_ahGwMLptp5GgWx8hADo_KPJDnOIpeZAPM2zWpbmbdXbIR3tQEsvf6IVs-ppM=w1000-h1000-k-no,N/A,false,2863,N/A,N/A,N/A
+21,Ahogadas Arduro,"Zona Industrial, Guadalajara",4.5,$60–$75,Servicio enfocado a trabajadores,"https://www.google.com/maps/place/Tortas+Ahogadas+Arduro/@20.6402821,-103.3597253,17z/data=!3m1!4b1!4m6!3m5!1s0x8428b27563c5b035:0x4d7d3efd7fc15c1d!8m2!3d20.6402821!4d-103.3597253!16s%2Fg%2F12hnz66l3?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D","
++52 33 3104 3577","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+",N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAEhP5xXtwi-RpvxDP9xnapfEh1943IUT0fMrW-uDqSrE6wSiqbn90rPgWXUn4UnQUHZIwai_I_ahGwMLptp5GgWx8hADo_KPJDnOIpeZAPM2zWpbmbdXbIR3tQEsvf6IVs-ppM=w1000-h1000-k-no,N/A,false,2863,N/A,N/A,N/A
 15,Tortas Enrique Perro,"Carr. a Tesistán, Zapopan",4.4,$75–$95,Especialidad en carnitas premium,"https://www.google.com/maps/place/Tortas+Ahogadas+Enrique+El+Original/@20.6752843,-103.429721,13z/data=!3m1!5s0x8428b1fd419b6e5b:0x828b997c8bfdc1cc!4m10!1m2!2m1!1sTortas+Enrique+Perro+Guadalajara!3m6!1s0x8428b1d23e72f8cf:0xe515c71a55864ff7!8m2!3d20.6752843!4d-103.3576232!15sCiBUb3J0YXMgRW5yaXF1ZSBQZXJybyBHdWFkYWxhamFyYVoiIiB0b3J0YXMgZW5yaXF1ZSBwZXJybyBndWFkYWxhamFyYZIBGG1leGljYW5fdG9ydGFfcmVzdGF1cmFudJoBI0NoWkRTVWhOTUc5blMwVkpRMEZuU1VOTmIxbDVSVWRSRUFF4AEA-gEECCEQLg!16s%2Fg%2F1vppsvhc?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D",N/A,N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAEgdYt5wShYPaZPCiJHiVnp-S3FYCGz_k3-NQbnOzCx3MD-q7E4a61AtlQY5ta3uFXH2os7NFmrG2y9RYjyKJb3A4JCMr8OfftUxbVZild363R1ByKjZf8AIRFMEn6IUyvYv1cS4A=w800-h800-k-no,N/A,false,2308,N/A,N/A,N/A
-2,El Profe Jiménez,"Andrés Terán y José María Vigil, Gdl",4.7,$65–$80,"Más de 2,000 reseñas positivas",https://www.google.com/maps/search/El%20Profe%20Jim%C3%A9nez%20Andr%C3%A9s%20Ter%C3%A1n%20y%20Jos%C3%A9%20Mar%C3%ADa%20Vigil%2C%20Gdl%20Guadalajara,"
-+52 33 3641 1755",N/A,https://www.facebook.com/ProfeJimenez/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAG-XPl1yxVPU-EBhVtUx-pkfhoqSOglEQDcaLHBP45LRix7ldsKFoIwic0tadJRJIGLYQBYhRAl52oPkIYVvYMBYt-FXImaZ8q-r5ADG8MF0_lv_JCjP_i8y3Ykqgt5grExZGISvDwYp3rK=w1000-h1000-k-no,N/A,false,2000,,,
+2,El Profe Jiménez,"Andrés Terán y José María Vigil, Gdl",4.6,$65–$80,"Más de 2,000 reseñas positivas",https://www.google.com/maps/search/El%20Profe%20Jim%C3%A9nez%20Andr%C3%A9s%20Ter%C3%A1n%20y%20Jos%C3%A9%20Mar%C3%ADa%20Vigil%2C%20Gdl%20Guadalajara,"
++52 33 3641 1755","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+",https://www.facebook.com/ProfeJimenez/,https://lh3.googleusercontent.com/gps-cs-s/APNQkAHmJtoCQgtVJ7iIH8aX8yB2HVIbpsqz38CcknPYOb356cbXwyulXbyUHCYn4oWxBlCE5JximreVEy83g3u0J7NDRkVN9HaYpORk6m64lkcXEWTdpzsFC4fHJ76nxhMeXFCiPW9NqQx_bcjA=w1000-h1000-k-no,N/A,false,4319,,,
 24,Tortas El Pelón,Lomas de Zapopan,4.4,$55–$70,Precios altamente competitivos,https://www.google.com/maps/search/Tortas%20El%20Pel%C3%B3n%20Lomas%20de%20Zapopan%20Guadalajara,"
-+52 33 1353 6883",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGVz9oT4uIrzSNS3tLzeln7wgCi2a6PpjoaDQZfDgArK6w6VAx4jSY117uuZvZ8o7qr9bXOhMz7RPsEA1HRXYpstjJ63tDsHmsw6C8NZUd9SQ76y5PlFESRREtgMk95Wpp-vzk=w1000-h1000-k-no,N/A,false,1959,N/A,N/A,N/A
++52 33 1353 6883","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+",N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGVz9oT4uIrzSNS3tLzeln7wgCi2a6PpjoaDQZfDgArK6w6VAx4jSY117uuZvZ8o7qr9bXOhMz7RPsEA1HRXYpstjJ63tDsHmsw6C8NZUd9SQ76y5PlFESRREtgMk95Wpp-vzk=w1000-h1000-k-no,N/A,false,1959,N/A,N/A,N/A
 22,Tortas Ahogadas Dany,"Arcos Vallarta, Guadalajara",4.6,$75–$95,Salsa con equilibrio de picante,https://www.google.com/maps/search/Tortas%20Ahogadas%20Dany%20Arcos%20Vallarta%2C%20Guadalajara,"
 +52 33 3466 4628",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGGW3Kh7PQmEyKsCsDl7RG_0fLaCGnRLaxfFU9MLP0U0PpTs2iLyb_-etgp7bvRo4xXtSXCh2-cBC7PbNR4Z16TyEF-NoSZqVJDp2hzj2Ty-oBsgE0BpbeFBlmQYtBl7Pkt-g3Ag5zmbThD=w1000-h1000-k-no,N/A,false,1897,N/A,N/A,N/A
 19,Tortas Chucky,Zapopan Centro,4.4,$60–$75,Preferida por el sector estudiantil,https://www.google.com/maps/search/Tortas%20Chucky%20Zapopan%20Centro%20Guadalajara,"
-+52 33 3633 4720",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGOJMCFkD_r_gWmv77d5hVk09rL2HlE915htj98AZU03fUU3XNXv6QT2uETYGDqhNAtT5ub7iXY3td_XdbXC6mVeK_hzYIdYRDTWEnNBqCpoAv6Wm31D9GdMu6yCYsKtqse6lU=w1000-h1000-k-no,N/A,false,1606,N/A,N/A,N/A
++52 33 3633 4720","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+",N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGOJMCFkD_r_gWmv77d5hVk09rL2HlE915htj98AZU03fUU3XNXv6QT2uETYGDqhNAtT5ub7iXY3td_XdbXC6mVeK_hzYIdYRDTWEnNBqCpoAv6Wm31D9GdMu6yCYsKtqse6lU=w1000-h1000-k-no,N/A,false,1606,N/A,N/A,N/A
 18,Tortas George,"Zona Minerva, Guadalajara",4.5,$75–$95,Famosa por sus porciones,https://www.google.com/maps/search/Tortas%20George%20Guadalajara%20Jalisco,"
 +52 33 3605 4851",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAElsKyEJdKztOUktCCEGNNsdaOults30n-3n99bJlMD2QNk8uMXWLZfNUqVqBN6WBrBPmwBeoOVVwJ3_IDTox6Tngiq-9ctmy5pOSD-RWB6ZgqEUmimBgBk_V5iMTp5iAabV1-tUJZ0KGTf=w1000-h1000-k-no,N/A,false,1401,N/A,N/A,N/A
 26,Tortas Los Amigos,"Fracc. Bugambilias, Zapopan",4.5,$65–$80,Ambiente familiar y tranquilo,https://www.google.com/maps/search/Tortas%20Los%20Amigos%20Fracc.%20Bugambilias%2C%20Zapopan%20Guadalajara,"
 +52 33 3181 7275",N/A,N/A,https://lh3.googleusercontent.com/gps-proxy/ALd4DhFx2nmgSeSqE_hZFYdTyW5TyLdtj1AbWD84hgbqSoa8fxTJSW7Egz2BHce0J9gOTiICjIvu_wKHkdF0-i5QdQYonFVgzYYfWgyERaSXLJOY3vrREHzNppkSYtodkMki8dDu0YKDxF3xAYV1gdEoyQPrmF1c0IvtD4t6gSdERQfgeV27geIlBPjb6xt7f2DwQ-OWkVU=w1000-h1000-k-no,N/A,false,1389,N/A,N/A,N/A
 29,Tortas El Güero,Mercado de Abastos,4.7,$65–$85,Alto flujo de clientes diarios,"https://www.google.com/maps/place/Tortas+Ahogadas+El+G%C3%BCero/@0,-103.2821019,0z/data=!4m10!1m2!2m1!1sTortas+El+G%C3%BCero+Guadalajara!3m6!1s0x8428b393a250117b:0x18866d3dd9b7032!8m2!3d20.6439795!4d-103.2821019!15sChxUb3J0YXMgRWwgR8O8ZXJvIEd1YWRhbGFqYXJhWh4iHHRvcnRhcyBlbCBnw7xlcm8gZ3VhZGFsYWphcmGSARJtZXhpY2FuX3Jlc3RhdXJhbnSaASNDaFpEU1VoTk1HOW5TMFZKUTBGblNVUlVkVGxtV1VKM0VBReABAPoBBAgAEEk!16s%2Fg%2F1ptwvl32q?entry=ttu&g_ep=EgoyMDI2MDUxMS4wIKXMDSoASAFQAw%3D%3D","
 +52 33 2046 2380",N/A,https://www.facebook.com/profile.php?id=100063723632640,https://lh3.googleusercontent.com/gps-cs-s/APNQkAFnJUcZU5ViIvVHCQN4Kcu5PRf3t_5EEJ1jsQfS2gXZ3drq1XMQ9rUyDeltVDZnFiHEv9hN1M10GQHjZKEUyqJSPWHE5r1P3vw_LU-S5Y5StGZyDCMvFmBmET2aNSW3iL4cd5oX=w800-h800-k-no,N/A,false,1341,N/A,N/A,Restaurante mexicano
-12,Tortas Pepe's,Av. Vallarta (Los Cubos),4.5,$70–$90,Muy concurrida por su ubicación,https://www.google.com/maps/search/Tortas%20Pepe's%20Av.%20Vallarta%20(Los%20Cubos)%20Guadalajara,"
-+52 33 1578 8232",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAHEbZ1oBSOOrk0MaEPn2ifMwyTEZ2FO-sNRLe_5LsBWWufutQxsPGjeWhpH4FvRe54RmKMoknhzqazcPPuS4ej2z9YtQ9djeoYyxdHxfHL-f8yZxY0f0Q45VVCDWAMIos_pJ1SZLA=w1000-h1000-k-no,N/A,false,1011,N/A,N/A,N/A
+12,Tortas Pepe's,Av. Vallarta (Los Cubos),4.7,$70–$90,Muy concurrida por su ubicación,https://www.google.com/maps/search/Tortas%20Pepe's%20Av.%20Vallarta%20(Los%20Cubos)%20Guadalajara,"
++52 33 1578 8232","Horarios de mayor concurrencia
+jueves
+
+
+
+6a.m.
+9a.m.
+12p.m.
+3p.m.
+6p.m.
+9p.m.
+",N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAHEbZ1oBSOOrk0MaEPn2ifMwyTEZ2FO-sNRLe_5LsBWWufutQxsPGjeWhpH4FvRe54RmKMoknhzqazcPPuS4ej2z9YtQ9djeoYyxdHxfHL-f8yZxY0f0Q45VVCDWAMIos_pJ1SZLA=w1000-h1000-k-no,N/A,false,1011,N/A,N/A,N/A
 14,Tortas Bigotes,"Sierra Madre 316, Independencia",4.5,$65–$80,Reconocidas por su rapidez,https://www.google.com/maps/search/Tortas%20Bigotes%20Sierra%20Madre%20316%2C%20Independencia%20Guadalajara,"
 +52 33 3638 9046",N/A,N/A,https://lh3.googleusercontent.com/gps-cs-s/APNQkAGbH2YjMd7MsO7LBaz10hMzS6AHJdi3z6KLolWF-VarXpqZ716qodqgHQlfagLcHYyH9AOd3lPY1D-XRjQxYZsm-UkDiHF6_oECWp2ScKdXzPuJ-OtRvFCAnGYLdxhpnABVIkCQSg=w1000-h1000-k-no,N/A,false,963,N/A,N/A,N/A
 16,Tortas El Cartero,"Colonia Monraz, Guadalajara",4.5,$65–$80,Salsa artesanal distintiva,"https://www.google.com/maps/place/Tortas+Ahogadas+El+Cartero/@20.6937127,-103.3503757,17z/data=!4m10!1m2!2m1!1sTortas+El+Cartero+Colonia+Monraz,+Guadalajara+Guadalajara+Jalisco!3m6!1s0x8428b1c34108c62f:0xc5ac5ced151eadc4!8m2!3d20.6937127!4d-103.3458696!15sCkFUb3J0YXMgRWwgQ2FydGVybyBDb2xvbmlhIE1vbnJheiwgR3VhZGFsYWphcmEgR3VhZGFsYWphcmEgSmFsaXNjb1pCIkB0b3J0YXMgZWwgY2FydGVybyBjb2xvbmlhIG1vbnJheiBndWFkYWxhamFyYSBndWFkYWxhamFyYSBqYWxpc2NvkgESbWV4aWNhbl9yZXN0YXVyYW50mgEkQ2hkRFNVaE5NRzluUzBWSlEwRm5TVU10TUMxSWFuWm5SUkFC4AEA-gEECAAQPw!16s%2Fg%2F11bwpt_03p?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D","
