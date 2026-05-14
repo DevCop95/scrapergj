@@ -67,9 +67,9 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 }
             }
 
-            // Wait for Maps to load review data
-            await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
-            await page.waitForTimeout(3000);
+            // Wait for business name to load (not networkidle - Maps never stops loading tiles)
+            await page.waitForSelector('h1.DUwDvf, h1.fontHeadlineLarge', { state: 'visible', timeout: 10000 }).catch(() => {});
+            await page.waitForTimeout(2000);
 
             const currentTitle = await page.evaluate(() => {
                 const h1 = document.querySelector('h1.DUwDvf') || document.querySelector('h1.fontHeadlineLarge');
@@ -150,22 +150,26 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
             // Extract review count - multiple strategies
             let reviewCount = 0;
 
-            // Strategy 1: Button selector
+            // Strategy 1: Button selector with flexible regex (no parentheses required)
             const reviewButton = document.querySelector('button[jsaction*="pane.rating"]') ||
                                 document.querySelector('button[aria-label*="reseñ"]') ||
                                 document.querySelector('button[aria-label*="review"]');
             if (reviewButton) {
                 const text = reviewButton.innerText || reviewButton.getAttribute('aria-label') || '';
-                const match = text.match(/\((\d[\d,\.]+)\)/);
-                if (match) reviewCount = parseInt(match[1].replace(/[,\.]/g, ''));
+                // Match "1,189 reseñas" OR "(1,189)" OR "1.189 reviews"
+                const match = text.match(/(\d[\d,\.]+)\s*(reseñas?|reviews?)?/i);
+                if (match) {
+                    const num = parseInt(match[1].replace(/[,\.]/g, ''));
+                    if (!isNaN(num) && num >= 10) reviewCount = num;
+                }
             }
 
-            // Strategy 2: Scan page text for "(X reseñas)" pattern
+            // Strategy 2: Scan page text - flexible (with or without parentheses)
             if (reviewCount === 0) {
                 const bodyText = document.body.innerText;
                 const patterns = [
-                    /\((\d[\d,\.]+)\s*reseñas?\)/gi,
-                    /\((\d[\d,\.]+)\s*reviews?\)/gi
+                    /(\d[\d,\.]+)\s*reseñas?/gi,
+                    /(\d[\d,\.]+)\s*reviews?/gi
                 ];
 
                 for (const pattern of patterns) {
@@ -250,8 +254,8 @@ async function startRepair() {
 
         const page = await context.newPage();
 
-        // Block unnecessary resources for speed (60% bandwidth/CPU savings)
-        await page.route('**/*.{woff,woff2,ttf,eot,css}', route => route.abort());
+        // Block unnecessary resources for speed (images, fonts, analytics - NOT CSS!)
+        await page.route('**/*.{png,jpg,jpeg,gif,webp,svg,woff,woff2,ttf,eot}', route => route.abort());
         await page.route('**/*{google-analytics,googletagmanager,doubleclick,facebook,twitter}*', route => route.abort());
 
         pool.push({ page, busy: false });
