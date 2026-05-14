@@ -48,7 +48,7 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
             .replace(/\s+/g, ' ').trim();
 
         const targetNorm = normalize(businessName);
-        const targetWords = targetNorm.split(' ').filter(w => w.length > 2);
+        const targetWords = targetNorm.split(' ').filter(w => w.length >= 2);  // Include 2-char words
         const addressNorm = normalize(address);
 
         async function performSearch(query) {
@@ -72,8 +72,8 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 let bestScore = 0;
 
                 for (let i = 0; i < Math.min(count, 10); i++) {
-                    const text = await results.nth(i).innerText();
-                    const normalizedText = normalize(text);
+                    const ariaLabel = await results.nth(i).getAttribute('aria-label') || '';
+                    const normalizedText = normalize(ariaLabel);
 
                     let score = 0;
                     for (const word of targetWords) {
@@ -94,12 +94,12 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 }
             }
 
-            // Wait for panel to load - wait for specific element, not networkidle
+            // Wait for panel to load
             await page.waitForSelector('h1.DUwDvf, h1.fontHeadlineLarge', { state: 'visible', timeout: 10000 }).catch(() => {});
-            await page.waitForTimeout(2000);
+            await page.waitForTimeout(3000);
 
             // Validate: h1 panel must be the business we want
-            const panelData = await page.evaluate(() => {
+            let panelData = await page.evaluate(() => {
                 const h1 = document.querySelector('h1.DUwDvf') || document.querySelector('h1.fontHeadlineLarge');
                 const addressEl = document.querySelector('button[data-item-id="address"]') ||
                                  document.querySelector('button[aria-label*="Dirección"]');
@@ -108,6 +108,20 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                     panelAddress: addressEl ? addressEl.innerText.trim() : ''
                 };
             });
+
+            // If empty title, wait more and retry
+            if (!panelData.title) {
+                await page.waitForTimeout(3000);
+                panelData = await page.evaluate(() => {
+                    const h1 = document.querySelector('h1.DUwDvf') || document.querySelector('h1.fontHeadlineLarge');
+                    const addressEl = document.querySelector('button[data-item-id="address"]') ||
+                                     document.querySelector('button[aria-label*="Dirección"]');
+                    return {
+                        title: h1 ? h1.innerText.trim() : '',
+                        panelAddress: addressEl ? addressEl.innerText.trim() : ''
+                    };
+                });
+            }
 
             const currentNorm = normalize(panelData.title);
             const matchedWords = targetWords.filter(w => currentNorm.includes(w));
@@ -134,21 +148,24 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
             const maxLen = Math.max(targetNorm.length, currentNorm.length);
             const similarity = 1 - distance / maxLen;
 
-            // Address validation: at least one address word must match panel address
+            // Address validation: relaxed for vague addresses
             let addressMatch = true;
-            if (panelData.panelAddress && address) {
+            if (panelData.panelAddress && address && panelData.panelAddress.length > 10) {
                 const panelAddrNorm = normalize(panelData.panelAddress);
-                const addrWords = addressNorm.split(' ').filter(w => w.length > 3 && !/guadalajara|jalisco|mexico/.test(w));
+                const addrWords = addressNorm.split(' ').filter(w => w.length > 3 && !/guadalajara|jalisco|mexico|zona|colonia|cerca/.test(w));
                 const addrMatched = addrWords.filter(w => panelAddrNorm.includes(w));
                 if (addrWords.length > 0) {
-                    addressMatch = addrMatched.length / addrWords.length >= 0.3;
+                    addressMatch = addrMatched.length / addrWords.length >= 0.1;  // 10% threshold
+                } else {
+                    addressMatch = true;  // No specific address words = accept
                 }
             }
 
-            // Strict match: name similarity + address confirmation
-            const nameMatch = matchRatio >= 0.6 || similarity >= 0.75 ||
-                             targetNorm.includes(currentNorm) || currentNorm.includes(targetNorm);
-            const matched = nameMatch && addressMatch;
+            // Match: strong name match OR (decent name + address)
+            const strongNameMatch = matchRatio >= 0.7 || similarity >= 0.85;
+            const decentNameMatch = matchRatio >= 0.5 || similarity >= 0.7 ||
+                                   targetNorm.includes(currentNorm) || currentNorm.includes(targetNorm);
+            const matched = strongNameMatch || (decentNameMatch && addressMatch);
 
             return { title: panelData.title, matchRatio, matched, similarity, addressMatch };
         }
