@@ -2,6 +2,10 @@
 
 Guía interactiva de los mejores negocios de comida en Guadalajara, Jalisco.
 
+## 🌐 Demo en Vivo
+
+**https://devcop95.github.io/scrapergj/**
+
 ## Categorías
 
 - **Tacos y Varios** (30 negocios)
@@ -10,11 +14,11 @@ Guía interactiva de los mejores negocios de comida en Guadalajara, Jalisco.
 
 ## Características
 
-- ✅ 90 negocios verificados en Guadalajara
-- ✅ Fotos reales de cada negocio
-- ✅ Enlaces directos a Google Maps
-- ✅ Calificaciones, precios y horarios
-- ✅ Búsqueda por nombre, dirección o especialidad
+- ✅ **90 negocios verificados** con datos completos de Google Maps
+- ✅ **Sistema Top 10**: Ranking por número de reseñas (👑 badge especial)
+- ✅ **72+ negocios** con review count real scraped
+- ✅ Fotos reales, teléfonos, horarios, precios
+- ✅ Búsqueda fuzzy con tolerancia a errores
 - ✅ Modo oscuro/claro
 - ✅ Exportación a Excel
 
@@ -44,15 +48,41 @@ Los datos están en 3 archivos CSV enriquecidos:
 - SheetJS (exportación Excel)
 - Playwright (scraping de datos)
 
-## Mantenimiento
+## Top 10 Clientes (por Reviews)
 
-### Actualizar datos
+### Tacos
+1. Taco Fish Paz: **20,000** reviews ⭐4.7
+2. Tomate Taquería: **17,500** reviews ⭐4.7
+3. Tacos Los Generales: **11,189** reviews ⭐4.5
+
+### Tortas Ahogadas
+1. Tortas La Chata: **23,066** reviews ⭐4.4
+2. José de Bicicleta: **6,537** reviews ⭐4.8
+3. Ahogadas de Sánchez: **6,536** reviews ⭐4.6
+
+### Menudo/Birria
+1. Birria y carne asada Don José: **6,748** reviews ⭐4.7
+2. Super Menudería Cano: **4,735** reviews ⭐4.6
+3. Menudería La Güera: **4,127** reviews ⭐4.4
+
+## Scripts de Mantenimiento
 
 ```bash
+# Reparar datos faltantes (browser pooling)
 node scraper.js
-```
 
-Verifica y actualiza información de Google Maps para todos los negocios.
+# Scrape review counts (stealth mode)
+node scrape_all_reviews.js
+
+# Enriquecer top 10 con datos extra
+node enrich_top10.js
+
+# Buscar Maps URLs faltantes
+node fix_missing.js
+
+# Buscar fotos faltantes
+node fix_photos.js
+```
 
 ---
 

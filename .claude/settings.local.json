@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(npm install *)",
+      "Bash(node *)",
+      "Bash(npx playwright *)",
+      "Bash(tee /tmp/scraper_output.log)",
+      "Bash(awk -F',' 'NR>1 {print $3, $1}')",
+      "Bash(tee /tmp/scrape_reviews.log)",
+      "Bash(awk '/Top 10 by review count:/,/Updated enriched/')",
+      "Bash(curl -s \"https://www.google.com/maps/place/Super+Menuder%C3%ADa+Cano/@20.6896818,-103.357\")"
+    ]
+  }
+}
