@@ -383,9 +383,10 @@ async function startRepair(forceAll = false) {
                 if (extra) {
                     const updated = { ...item };
                     if (extra.photo && extra.photo !== 'N/A') updated.photo = extra.photo;
-                    if (extra.mapsUrl && extra.mapsUrl.includes('/maps/place/')) {
+                    if (extra.mapsUrl && extra.mapsUrl.includes('/maps/')) {
                         updated['📍 Google Maps'] = extra.mapsUrl;
-                        console.log(`  ✅ Maps URL`);
+                        const isPlace = extra.mapsUrl.includes('/place/');
+                        console.log(`  ✅ Maps URL${isPlace ? '' : ' (search)'}`);
                     }
                     if (extra.phone && extra.phone !== 'N/A') updated.phone = extra.phone;
                     if (extra.website && extra.website !== 'N/A') updated.website = extra.website;
