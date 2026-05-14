@@ -285,6 +285,16 @@ async function startRepair() {
                     if (extra.website && extra.website !== 'N/A') updated.website = extra.website;
                     if (extra.hours && extra.hours !== 'N/A') updated.hours = extra.hours;
 
+                    // Update rating and review count from scrape
+                    if (extra.stars && extra.stars !== 'N/A') {
+                        updated['⭐'] = extra.stars;
+                        console.log(`  ✅ Rating: ${extra.stars}★`);
+                    }
+                    if (extra.reviewCount && extra.reviewCount !== '0') {
+                        updated.reviewCount = extra.reviewCount;
+                        console.log(`  ✅ Reviews: ${parseInt(extra.reviewCount).toLocaleString()}`);
+                    }
+
                     repairedData.push(updated);
                     repairedCount++;
                 } else {
