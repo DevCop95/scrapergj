@@ -250,6 +250,20 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 }
             }
 
+            // Price extraction - buscar símbolos $ cerca de rating
+            let priceRange = 'N/A';
+            const bodyText = document.body.innerText;
+            const lines = bodyText.split('\n');
+
+            for (const line of lines) {
+                // Match patterns: "$300-800", "$300-800 por persona", "$$", "$$$"
+                const priceMatch = line.match(/(\$+[\d,\.]+-[\d,\.]+(?:\s*por\s*persona)?|\$+(?!\d))/);
+                if (priceMatch && line.length < 100) {
+                    priceRange = priceMatch[1].trim();
+                    break;
+                }
+            }
+
             const phone = getText('button[data-item-id^="phone:tel:"]') ||
                           getText('button[aria-label^="Teléfono"]') ||
                           getText('button[aria-label*="phone"]');
@@ -282,7 +296,8 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 photo: photo,
                 plusCode: getText('button[aria-label^="Plus Code"]'),
                 stars: stars,
-                reviewCount: reviewCount.toString()
+                reviewCount: reviewCount.toString(),
+                priceRange: priceRange
             };
         });
 
@@ -404,6 +419,10 @@ async function startRepair(forceAll = false) {
                     if (extra.reviewCount && extra.reviewCount !== '0') {
                         updated.reviewCount = extra.reviewCount;
                         console.log(`  ✅ Reviews: ${parseInt(extra.reviewCount).toLocaleString()}`);
+                    }
+                    if (extra.priceRange && extra.priceRange !== 'N/A') {
+                        updated['💰 Precio (MXN)'] = extra.priceRange;
+                        console.log(`  ✅ Price: ${extra.priceRange}`);
                     }
 
                     repairedData.push(updated);
