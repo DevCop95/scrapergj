@@ -119,7 +119,6 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
 
         if (!searchResult.matched) {
             console.log(`  ⚠️ SKIP: "${searchResult.title}" doesn't match "${businessName}"`);
-            await browser.close();
             return null;
         }
 
@@ -135,7 +134,29 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 return el ? el.getAttribute('href') : 'N/A';
             };
 
-            const phone = getText('button[data-item-id^="phone:tel:"]') || 
+            // Extract rating (stars)
+            const ratingElement = document.querySelector('span[role="img"][aria-label*="estrella"]') ||
+                                 document.querySelector('span[role="img"][aria-label*="star"]') ||
+                                 document.querySelector('div[role="img"][aria-label*="estrella"]');
+            let stars = 'N/A';
+            if (ratingElement) {
+                const ariaLabel = ratingElement.getAttribute('aria-label');
+                const match = ariaLabel.match(/([\d,\.]+)\s*estrella/i);
+                if (match) stars = match[1].replace(',', '.');
+            }
+
+            // Extract review count
+            const reviewButton = document.querySelector('button[jsaction*="pane.rating"]') ||
+                                document.querySelector('button[aria-label*="reseñ"]') ||
+                                document.querySelector('button[aria-label*="review"]');
+            let reviewCount = 0;
+            if (reviewButton) {
+                const text = reviewButton.innerText || reviewButton.getAttribute('aria-label') || '';
+                const match = text.match(/\((\d[\d,\.]+)\)/);
+                if (match) reviewCount = parseInt(match[1].replace(/[,\.]/g, ''));
+            }
+
+            const phone = getText('button[data-item-id^="phone:tel:"]') ||
                           getText('button[aria-label^="Teléfono"]') ||
                           getText('button[aria-label*="phone"]') ||
                           getText('div[data-tooltip="Copiar el número de teléfono"]');
@@ -168,7 +189,9 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 hours: hours,
                 website: website,
                 photo: photo,
-                plusCode: getText('button[aria-label^="Plus Code"]')
+                plusCode: getText('button[aria-label^="Plus Code"]'),
+                stars: stars,
+                reviewCount: reviewCount.toString()
             };
         });
 
@@ -183,11 +206,25 @@ async function startRepair() {
     // Create browser pool (5 pages)
     const browser = await chromium.launch({
         headless: true,
-        channel: 'chromium'
+        channel: 'chromium',
+        args: [
+            '--disable-blink-features=AutomationControlled',
+            '--disable-dev-shm-usage'
+        ]
     });
     const pool = [];
     for (let i = 0; i < 5; i++) {
-        const context = await browser.newContext();
+        const context = await browser.newContext({
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+            locale: 'es-MX'
+        });
+
+        // Anti-detection stealth
+        await context.addInitScript(() => {
+            Object.defineProperty(navigator, 'webdriver', { get: () => false });
+            window.chrome = { runtime: {} };
+        });
+
         const page = await context.newPage();
         pool.push({ page, busy: false });
     }
