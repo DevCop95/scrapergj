@@ -212,53 +212,40 @@ async function scrapeBusinessDataPlaywright(businessName, address, page) {
                 if (match) stars = match[1].replace(',', '.');
             }
 
-            // Review count - flexible extraction
+            // Review count - conservative extraction (button text only)
             let reviewCount = 0;
 
-            // Strategy 1: Buttons with review-related attributes
-            const reviewButton = document.querySelector('button[jsaction*="pane.rating"]') ||
-                                document.querySelector('button[aria-label*="reseñ"]') ||
-                                document.querySelector('button[aria-label*="review"]');
+            // Only use review button innerText (most reliable, scoped to business panel)
+            const reviewButton = document.querySelector('button[jsaction*="pane.rating"]');
             if (reviewButton) {
-                const text = reviewButton.innerText || reviewButton.getAttribute('aria-label') || '';
+                const text = reviewButton.innerText || '';
                 const match = text.match(/(\d[\d,\.]+)\s*(reseñas?|reviews?)?/i);
                 if (match) {
                     const num = parseInt(match[1].replace(/[,\.]/g, ''));
-                    if (!isNaN(num) && num >= 10) reviewCount = num;
+                    if (!isNaN(num) && num >= 1) reviewCount = num;
                 }
             }
 
-            // Strategy 2: aria-labels with review/opinion counts
+            // Fallback: button aria-label if innerText empty
+            if (reviewCount === 0 && reviewButton) {
+                const ariaLabel = reviewButton.getAttribute('aria-label') || '';
+                const match = ariaLabel.match(/(\d[\d,\.]+)\s*(reseñas?|reviews?|opiniones?)/i);
+                if (match) {
+                    const num = parseInt(match[1].replace(/[,\.]/g, ''));
+                    if (!isNaN(num) && num >= 1) reviewCount = num;
+                }
+            }
+
+            // Strategy 3: Scan rating container (next to stars element only)
             if (reviewCount === 0) {
-                const allElements = document.querySelectorAll('[aria-label]');
-                for (const el of allElements) {
-                    const label = el.getAttribute('aria-label') || '';
-                    const m = label.match(/(\d[\d,\.]+)\s*(reseñas?|reviews?|opiniones?)/i);
+                const ratingContainer = ratingElement?.closest('div');
+                if (ratingContainer) {
+                    const text = ratingContainer.innerText || '';
+                    // Match: "4.5 (1,234)" or "4.5★ 1,234 reseñas"
+                    const m = text.match(/[\d,\.]+[\s★⭐]*[\(\s]*(\d[\d,\.]+)\s*\)?[\s]*(reseñas?|reviews?|opiniones?)?/i);
                     if (m) {
                         const num = parseInt(m[1].replace(/[,\.]/g, ''));
-                        if (!isNaN(num) && num > reviewCount && num >= 1 && num < 1000000) {
-                            reviewCount = num;
-                        }
-                    }
-                }
-            }
-
-            // Strategy 3: Scan full page text
-            if (reviewCount === 0) {
-                const bodyText = document.body.innerText;
-                const patterns = [
-                    /(\d[\d,\.]+)\s*reseñas?/gi,
-                    /(\d[\d,\.]+)\s*reviews?/gi,
-                    /(\d[\d,\.]+)\s*opiniones?/gi
-                ];
-
-                for (const pattern of patterns) {
-                    const matches = [...bodyText.matchAll(pattern)];
-                    for (const m of matches) {
-                        const num = parseInt(m[1].replace(/[,\.]/g, ''));
-                        if (!isNaN(num) && num > reviewCount && num >= 10 && num < 1000000) {
-                            reviewCount = num;
-                        }
+                        if (!isNaN(num) && num >= 1 && num < 1000000) reviewCount = num;
                     }
                 }
             }
@@ -389,7 +376,8 @@ async function startRepair(forceAll = false) {
         for (const item of dataRows) {
             const needsPhoto = !item.photo || item.photo === 'N/A';
             const needsMapsUrl = !item['📍 Google Maps'] || item['📍 Google Maps'] === 'N/A';
-            const needsRepair = forceAll || needsPhoto || needsMapsUrl;
+            const needsReviewCount = !item.reviewCount || item.reviewCount === '' || item.reviewCount === '0';
+            const needsRepair = forceAll || needsPhoto || needsMapsUrl || needsReviewCount;
 
             if (needsRepair) {
                 console.log(`\n🔍 ${item['Negocio']}`);
