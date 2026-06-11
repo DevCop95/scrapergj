@@ -8,62 +8,69 @@ Guía interactiva de los mejores negocios de comida en Guadalajara, Jalisco.
 
 ## Categorías
 
-- **Tacos y Varios** (30 negocios)
-- **Tortas Ahogadas** (30 negocios)
-- **Menuderías** (30 negocios)
+- **Tacos y Varios** (100 negocios)
+- **Tortas Ahogadas** (100 negocios)
+- **Menuderías** (100 negocios)
 
 ## Características
 
-- ✅ **90 negocios verificados** con datos completos de Google Maps
-- ✅ **Sistema Top 10**: Ranking por número de reseñas (👑 badge especial)
-- ✅ **90/90 negocios** con review count (100% cobertura)
-- ✅ Fotos reales, teléfonos, horarios, precios
-- ✅ Búsqueda fuzzy con tolerancia a errores
-- ✅ Modo oscuro/claro
-- ✅ Exportación a Excel
+- ✅ **300 negocios verificados** con datos completos de Google Maps
+- ✅ **Garantía sin duplicados**: Deduplicación global cruzada por nombre y teléfono en todas las categorías
+- ✅ **Filtrado estricto por reputación**: Cada negocio tiene **más de 800 opiniones** en Google Maps
+- ✅ **Sistema Top 10**: Ranking por número de reseñas (👑 badge especial en el mapa y en la tarjeta)
+- ✅ **300/300 negocios** con cantidad de opiniones verificada (100% de cobertura)
+- ✅ Fotos reales, teléfonos, horarios completos, nivel de precios
+- ✅ Búsqueda inteligente (fuzzy search) con Fuse.js
+- ✅ Diseño moderno responsivo y modo oscuro/claro automático
+- ✅ Exportación a Excel organizada con pestañas por categoría, mapa embebido y resumen general
 
 ## Uso
 
 ### Web
 
-Abre `index.html` en tu navegador.
+Abre `index.html` en tu navegador o levanta un servidor estático:
+```bash
+npx http-server -p 8080
+```
+Y accede a `http://127.0.0.1:8080/index.html`.
 
 ### Excel
 
-Click en "Exportar Excel" para descargar todos los negocios organizados por categoría.
+Haz clic en **"Exportar Excel"** para descargar la base de datos completa organizada en pestañas por categoría.
 
 ## Datos
 
-Los datos están en 3 archivos CSV enriquecidos:
+Los datos están almacenados en 3 archivos CSV enriquecidos y deduplicados:
 
-- `enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv` - Tacos
-- `enriched_-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv` - Tortas
-- `enriched_-Negocio-Direccin--PrecioMXN-Perfildecliente-Googl.csv` - Menuderías
+- `enriched_-Negocio-Direccin--PrecioMXN-Especialidad-GoogleMa.csv` - Tacos y Varios
+- `enriched_-Negocio-Direccin--PrecioMXN-Observaciones-GoogleM.csv` - Tortas Ahogadas
+- `enriched_-Negocio-Direccin--PrecioMXN-Perfildecliente-Googl.csv` - Menuderías y Birrias
 
 ## Tecnologías
 
-- HTML5 + Tailwind CSS
-- JavaScript vanilla
-- PapaParse (lectura CSV)
-- SheetJS (exportación Excel)
-- Playwright (scraping de datos)
+- HTML5 + Tailwind CSS (Responsivo + Glassmorphism)
+- JavaScript Vanilla
+- PapaParse (lectura de archivos CSV)
+- SheetJS (exportación a Excel limpia y con estilos de columna)
+- Fuse.js (búsqueda con tolerancia a errores ortográficos)
+- Playwright (raspador automatizado)
 
-## Top 10 Clientes (por Reviews)
+## Top 3 Clientes (por Reseñas)
 
 ### Tacos
-1. Taco Fish Paz: **20,000** reviews ⭐4.7
-2. Tomate Taquería: **17,500** reviews ⭐4.7
-3. Tacos Los Generales: **11,189** reviews ⭐4.5
+1. Tepatiani: **23,559** reviews ⭐4.3
+2. La Chata de Guadalajara: **23,193** reviews ⭐4.6
+3. Taco Fish Paz: **20,386** reviews ⭐4.7
 
 ### Tortas Ahogadas
-1. Tortas La Chata: **23,066** reviews ⭐4.4
-2. José de Bicicleta: **6,537** reviews ⭐4.8
-3. Ahogadas de Sánchez: **6,536** reviews ⭐4.6
+1. El Parián de Tlaquepaque: **50,868** reviews ⭐4.4
+2. El Abajeño Tlaquepaque: **10,064** reviews ⭐4.3
+3. Tortas Ahogadas Don Jose El De La Bicicleta: **6,561** reviews ⭐4.3
 
-### Menudo/Birria
-1. Birria y carne asada Don José: **6,748** reviews ⭐4.7
-2. Super Menudería Cano: **4,735** reviews ⭐4.6
-3. Menudería La Güera: **4,127** reviews ⭐4.4
+### Menuderías y Birrias
+1. Menudería San Juan: **92,065** reviews ⭐4.4
+2. Tianguis Tonalá: **35,481** reviews ⭐4.6
+3. Birrierías Chololo: **20,272** reviews ⭐4.6
 
 ## Scripts de Mantenimiento
 
