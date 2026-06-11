@@ -26,3 +26,7 @@ npm-debug.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# IDE/AI settings
+.claude/
+scratch/

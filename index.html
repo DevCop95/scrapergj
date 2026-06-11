@@ -26,7 +26,7 @@
     <!-- PapaParse CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <!-- SheetJS CDN for Excel export -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Fuse.js CDN for fuzzy search -->
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <style>
@@ -58,9 +58,12 @@
     <!-- Sticky Header -->
     <header class="sticky top-0 z-50 glass border-b border-gray-200 dark:border-gray-800 px-4 py-3">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
-            <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                <i class="fa-solid fa-map-location-dot mr-2"></i>GDL Food Guide
-            </h1>
+            <div>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    <i class="fa-solid fa-map-location-dot mr-2"></i>GDL Food Guide
+                </h1>
+                <p id="total-badge" class="text-[10px] text-gray-500 dark:text-gray-400 font-semibold mt-0.5">Cargando total...</p>
+            </div>
             <div class="flex items-center gap-2">
                 <button id="export-excel" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm font-semibold">
                     <i class="fa-solid fa-file-excel"></i>
@@ -144,12 +147,16 @@
                 ]);
                 render();
                 
+                const total = dataStore.tacos.length + dataStore.tortas.length + dataStore.menudo.length;
+                document.getElementById('total-badge').textContent = `${total} negocios de comida con >800 opiniones`;
+
+                // Reducido a 800ms para evitar bloquear clics del usuario innecesariamente
                 setTimeout(() => {
                     const overlay = document.getElementById('loading-overlay');
                     if (foodInterval) clearInterval(foodInterval);
                     overlay.style.opacity = '0';
                     setTimeout(() => { overlay.style.display = 'none'; }, 500);
-                }, 6000);
+                }, 800);
             } catch (error) {
                 console.error("Error loading data:", error);
                 document.getElementById('cards-container').innerHTML = `
@@ -181,7 +188,8 @@
                             return;
                         }
 
-                        dataStore[key] = results.data.map(item => ({
+                        dataStore[key] = results.data.map((item, index) => ({
+                            rank: item['#'] || (index + 1).toString(),
                             name: item['Negocio'] || '',
                             address: item['Dirección'] || '',
                             rating: item['⭐'] || '0',
@@ -205,6 +213,15 @@
                             if (bReviews !== aReviews) return bReviews - aReviews;
                             return parseFloat(b.rating) - parseFloat(a.rating);
                         });
+
+                        // Update rankings sequentially after sort
+                        dataStore[key].forEach((item, idx) => {
+                            item.rank = (idx + 1).toString();
+                        });
+
+                        // Update tab button count dynamically
+                        updateTabCount(key, dataStore[key].length);
+
                         resolve();
                     },
                     error: (error) => {
@@ -214,6 +231,22 @@
                     }
                 });
             });
+        }
+
+        function updateTabCount(category, count) {
+            const btn = document.querySelector(`button[data-category="${category}"]`);
+            if (!btn) return;
+            let iconHtml = '';
+            if (category === 'tacos') iconHtml = '<i class="fa-solid fa-taco mr-2"></i>';
+            else if (category === 'tortas') iconHtml = '<i class="fa-solid fa-bread-slice mr-2"></i>';
+            else if (category === 'menudo') iconHtml = '<i class="fa-solid fa-bowl-hot mr-2"></i>';
+            
+            let name = '';
+            if (category === 'tacos') name = 'Tacos y Varios';
+            else if (category === 'tortas') name = 'Tortas Ahogadas';
+            else if (category === 'menudo') name = 'Menuderías';
+            
+            btn.innerHTML = `${iconHtml}${name} (${count})`;
         }
 
         function render() {
@@ -271,7 +304,7 @@
                     <div class="p-5">
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex-1">
-                                <h3 class="font-bold text-lg group-hover:text-primary transition-colors ${item.isTop10 ? 'text-amber-700 dark:text-amber-400' : ''}">${item.name}</h3>
+                                <h3 class="font-bold text-lg group-hover:text-primary transition-colors ${item.isTop10 ? 'text-amber-700 dark:text-amber-400' : ''}">#${item.rank} ${item.name}</h3>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                     <i class="fa-solid fa-location-dot mr-1"></i>${item.address}
                                 </p>
@@ -373,74 +406,89 @@
 
         // Excel Export — includes Reseñas column, sorted by reviewCount DESC
         document.getElementById('export-excel').addEventListener('click', () => {
-            const workbook = XLSX.utils.book_new();
+            console.log("Botón de exportar Excel clickeado");
+            
+            if (typeof XLSX === 'undefined') {
+                alert("Error: La librería de exportación de Excel (SheetJS) no se ha cargado correctamente.");
+                console.error("SheetJS (XLSX) is undefined.");
+                return;
+            }
 
-            const categories = [
-                { key: 'tacos', name: 'Tacos y Varios' },
-                { key: 'tortas', name: 'Tortas Ahogadas' },
-                { key: 'menudo', name: 'Menuderías' }
-            ];
+            try {
+                const workbook = XLSX.utils.book_new();
 
-            categories.forEach(cat => {
-                // dataStore ya viene ordenado por reviewCount DESC desde loadCSV
-                const data = dataStore[cat.key].map((item, index) => ({
-                    '#': index + 1,
-                    'Negocio': item.name,
-                    'Dirección': item.address,
-                    'Calificación': parseFloat(item.rating) || 0,
-                    'Reseñas': parseInt(item.reviewCount) || 0,
-                    'Precio': item.price,
-                    'Teléfono': item.phone,
-                    'Horario': item.hours,
-                    'Detalles': item.detail
-                }));
-
-                const worksheet = XLSX.utils.json_to_sheet(data);
-
-                // Columna J = Google Maps (index 9)
-                worksheet['J1'] = { t: 's', v: 'Google Maps' };
-
-                dataStore[cat.key].forEach((item, index) => {
-                    const row = index + 2;
-                    const mapsUrl = item.maps && item.maps !== 'N/A'
-                        ? item.maps
-                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('"' + item.name + '" ' + item.address)}`;
-                    const mapsCell = XLSX.utils.encode_cell({ r: row - 1, c: 9 });
-                    worksheet[mapsCell] = { t: 's', v: 'Ver en Mapa', l: { Target: mapsUrl } };
-                });
-
-                const range = XLSX.utils.decode_range(worksheet['!ref']);
-                range.e.c = 9;
-                worksheet['!ref'] = XLSX.utils.encode_range(range);
-
-                worksheet['!cols'] = [
-                    { wch: 5 },   // #
-                    { wch: 30 },  // Negocio
-                    { wch: 40 },  // Dirección
-                    { wch: 12 },  // Calificación
-                    { wch: 12 },  // Reseñas
-                    { wch: 15 },  // Precio
-                    { wch: 15 },  // Teléfono
-                    { wch: 25 },  // Horario
-                    { wch: 50 },  // Detalles
-                    { wch: 15 }   // Google Maps
+                const categories = [
+                    { key: 'tacos', name: 'Tacos y Varios' },
+                    { key: 'tortas', name: 'Tortas Ahogadas' },
+                    { key: 'menudo', name: 'Menuderías' }
                 ];
 
-                XLSX.utils.book_append_sheet(workbook, worksheet, cat.name);
-            });
+                categories.forEach(cat => {
+                    // dataStore ya viene ordenado por reviewCount DESC desde loadCSV
+                    const data = dataStore[cat.key].map((item, index) => ({
+                        '#': index + 1,
+                        'Negocio': item.name,
+                        'Dirección': item.address,
+                        'Calificación': parseFloat(item.rating) || 0,
+                        'Reseñas': parseInt(item.reviewCount) || 0,
+                        'Precio': item.price,
+                        'Teléfono': item.phone,
+                        'Horario': item.hours,
+                        'Detalles': item.detail
+                    }));
 
-            const summaryData = [
-                { 'Categoría': 'Tacos y Varios', 'Total Negocios': dataStore.tacos.length },
-                { 'Categoría': 'Tortas Ahogadas', 'Total Negocios': dataStore.tortas.length },
-                { 'Categoría': 'Menuderías', 'Total Negocios': dataStore.menudo.length },
-                { 'Categoría': 'TOTAL', 'Total Negocios': dataStore.tacos.length + dataStore.tortas.length + dataStore.menudo.length }
-            ];
-            const summarySheet = XLSX.utils.json_to_sheet(summaryData);
-            summarySheet['!cols'] = [{ wch: 20 }, { wch: 15 }];
-            XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
+                    const worksheet = XLSX.utils.json_to_sheet(data);
 
-            const today = new Date().toISOString().split('T')[0];
-            XLSX.writeFile(workbook, `GDL_Food_Guide_${today}.xlsx`);
+                    // Columna J = Google Maps (index 9)
+                    worksheet['J1'] = { t: 's', v: 'Google Maps' };
+
+                    dataStore[cat.key].forEach((item, index) => {
+                        const row = index + 2;
+                        const mapsUrl = item.maps && item.maps !== 'N/A'
+                            ? item.maps
+                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('"' + item.name + '" ' + item.address)}`;
+                        const mapsCell = XLSX.utils.encode_cell({ r: row - 1, c: 9 });
+                        worksheet[mapsCell] = { t: 's', v: 'Ver en Mapa', l: { Target: mapsUrl } };
+                    });
+
+                    const range = XLSX.utils.decode_range(worksheet['!ref']);
+                    range.e.c = 9;
+                    worksheet['!ref'] = XLSX.utils.encode_range(range);
+
+                    worksheet['!cols'] = [
+                        { wch: 5 },   // #
+                        { wch: 30 },  // Negocio
+                        { wch: 40 },  // Dirección
+                        { wch: 12 },  // Calificación
+                        { wch: 12 },  // Reseñas
+                        { wch: 15 },  // Precio
+                        { wch: 15 },  // Teléfono
+                        { wch: 25 },  // Horario
+                        { wch: 50 },  // Detalles
+                        { wch: 15 }   // Google Maps
+                    ];
+
+                    XLSX.utils.book_append_sheet(workbook, worksheet, cat.name);
+                });
+
+                const summaryData = [
+                    { 'Categoría': 'Tacos y Varios', 'Total Negocios': dataStore.tacos.length },
+                    { 'Categoría': 'Tortas Ahogadas', 'Total Negocios': dataStore.tortas.length },
+                    { 'Categoría': 'Menuderías', 'Total Negocios': dataStore.menudo.length },
+                    { 'Categoría': 'TOTAL', 'Total Negocios': dataStore.tacos.length + dataStore.tortas.length + dataStore.menudo.length }
+                ];
+                const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+                summarySheet['!cols'] = [{ wch: 20 }, { wch: 15 }];
+                XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
+
+                const today = new Date().toISOString().split('T')[0];
+                console.log("Generando y descargando archivo Excel...");
+                XLSX.writeFile(workbook, `GDL_Food_Guide_${today}.xlsx`);
+                console.log("Descarga iniciada exitosamente.");
+            } catch (error) {
+                alert("Error durante la generación de Excel: " + error.message);
+                console.error("Error al exportar a Excel:", error);
+            }
         });
 
         // Animated food loading sequence
